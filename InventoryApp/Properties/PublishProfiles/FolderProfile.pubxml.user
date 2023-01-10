@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>D:\InventoryAppPublished</_PublishTargetUrl>
+    <History>True|2023-01-09T10:24:32.6416611Z;True|2023-01-09T16:39:45.6696150+07:00;True|2023-01-06T17:06:53.2787701+07:00;True|2023-01-06T11:52:32.7796641+07:00;True|2023-01-06T10:22:35.9150589+07:00;True|2023-01-06T10:20:39.6530620+07:00;True|2023-01-06T10:12:37.5126385+07:00;True|2022-12-29T10:57:17.3936893+07:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>

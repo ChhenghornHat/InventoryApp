@@ -1,0 +1,149 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+    ViewData["Title"] = "Login";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - InventoryApp</title>
+    <link rel="icon" href="~/logo/ptc-computer-logo.png" type="image/svg" />
+    <!-- Bootstrap 3.3.7 -->
+    <link href="~/assets/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link href="~/assets/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <!-- Ionicons -->
+    <link href="~/assets/bower_components/ionicons/css/ionicons.min.css" rel="stylesheet" />
+    <!-- Theme style -->
+    <link href="~/assets/dist/css/adminlte.min.css" rel="stylesheet" />
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+</head>
+<body class="hold-transition login-page" style="background-color: #eaeaea;">
+    <div class="login-box">
+        <div class="login-logo">
+            <img src="~/logo/ptc-computer-logo.png" width="250px" height="auto" />
+        </div>
+        <!-- /.login-logo -->
+        <div class="login-box-body">
+            <h3 class="login-box-msg">Login Inventory App</h3>
+
+            <form action="#" method="get">
+                <div class="callout callout-warning hide" style="padding: 8px; border-radius: 0">
+                    <p class="msg"></p>
+                </div>
+                <div class="form-group has-feedback">
+                    <input type="text" class="form-control" id="usercode" placeholder="User code" required>
+                </div>
+                <div class="form-group has-feedback">
+                    <input type="password" class="form-control" id="password" placeholder="Password" required>
+                </div>
+                <div class="form-group has-errors">
+                    <select class="form-control" id="select_company">
+                        <option value="">-- Select Company --</option>
+                    </select>
+                    <small class="help-block"></small>
+                </div>
+                <div class="row">
+                    <div class="col-xs-8">
+                        <div class="checkbox icheck">
+                            <label>
+                                @*<input type="checkbox"> Remember Me*@
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-xs-4">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">Login</button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
+
+        </div>
+        <img src="~/logo/shadow.png" style="width: 100%; margin-top: -15px" />
+        <!-- /.login-box-body -->
+    </div>
+    <!-- /.login-box -->
+
+    <!-- jQuery 3 -->
+    <script src="~/assets/bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="~/assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var form = $('form');
+            form.submit(function(e) {
+                if(!form[0].checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else {
+                    e.preventDefault();
+                    $.ajax({
+                        url: '@Url.Action("PostLogin","Login")',
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: { usercode: $('#usercode').val(), password: $('#password').val(), database: $('#select_company').val() },
+                        success: function(data) {
+                            //console.log(data)
+                            if(data == 0) {
+                                window.location.replace('@Url.Action("SearchFilter","Inventory")')
+                            } else {
+                                
+                                $('.hide').addClass('show')
+                                $('.hide').removeClass('hide')
+                                setTimeout(function(){
+                                    $('.show').addClass('hide')
+                                    $('.hide').removeClass('show')
+                                }, 7000)
+                                $('.msg').text("Wrong usercode or password!");
+                            }
+                        }
+                    })
+                }
+            });
+            
+            $('select').change(function () {
+                if($(this).val() != '') {
+                    $(':button[type="submit"]').prop('disabled', false);
+                    $('.has-errors').removeClass('has-error');
+                    $('.help-block').text('');
+                } else {
+                    $(':button[type="submit"]').prop('disabled', true);
+                    $('.has-errors').addClass('has-error');
+                    $('.help-block').text('The company is required and can not be empty!');
+                }
+            });
+
+            $.ajax({
+                url: '@Url.Action("getCompanyName","Login")',
+                type: 'GET',
+                dataType: 'JSON',
+                success: function(data) {
+                    console.log(data);
+                    for(i = 0;i < data.length;i++){
+                        $('#select_company').append('<option value=' + data[i].dbName + '>' + data[i].cmpName + '</option>');
+                        $('option:nth-child(2)').attr('selected', true);
+                    }
+                }
+            })
+        })
+    </script>
+    
+</body>
+</html>
+
+
