@@ -71,7 +71,7 @@ td ul li:nth-child(2) {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: rgba(0,0,0,0.5);
-    /*backdrop-filter: blur(2px);*/
+    backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
     align-items: center;

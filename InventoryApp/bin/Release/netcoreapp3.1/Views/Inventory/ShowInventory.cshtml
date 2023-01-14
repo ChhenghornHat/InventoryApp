@@ -10,9 +10,7 @@
     <p class="showMgs"></p>
 </div>
 
-<button type="button" class="btn btn-default SpeceType hide" data-toggle="modal" data-target="#modal-default">
-    
-</button>
+<button type="button" class="btn btn-default SpeceType hide" data-toggle="modal" data-target="#modal-default"></button>
 
 <input type="hidden" id="whsCode" value="@Model.whsCode" />
 <input type="hidden" id="itmsGrpCod" value="@Model.itmsGrpCod" />
@@ -117,6 +115,10 @@
 </div>
 <!-- /.row -->
 
+<div class="loading">
+    <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+</div>
+
 <div class="modal fade" id="modal-default">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -127,7 +129,6 @@
                 <h4 class="modal-title">Space or Type</h4>
             </div>
             <div class="modal-body">
-                <div ></div>
                 <textarea class="form-control" id="msg" rows="15" disabled></textarea>
             </div>
             <div class="modal-footer">
@@ -207,17 +208,15 @@
                         { extend: 'excel', className: 'btn bg-olive btn-flat' }
                     ],
                     dom:
-                        "<'row'<'col-md-0'l><'col-md-6'B><'col-md-6'f>>" +
-                        "<'row'<'col-md-12'tr>>" +
-                        "<'row'<'col-md-5'i><'col-md-7'p>>",
+                        "<'row'<'col-lg-0'l><'col-md-6'B><'col-md-6'f>>" +
+                        "<'row'<'col-lg-12'tr>>" +
+                        "<'row'<'col-lg-5'i><'col-md-7'p>>",
                     lengthMenu: [
                         [25]
                     ],
                 });
                 
                 table.rows.add(listInventory).draw();
-
-                //$('th:nth-child(1)').css('width', '40px');
 
             }
         }
@@ -226,6 +225,7 @@
     
     $('#searchBtn').click(function(e) {
         e.preventDefault();
+        loading();
         $('.collapseses').addClass('collapsed-box');
         $('.pluses').removeClass('fa-minus');
         $('.pluses').addClass('fa-plus');
@@ -308,19 +308,6 @@
                             ]
                         },
                         "responsive": true,
-
-                        //"responsive": {
-                        //    details: {
-                        //        type: 'column',
-                        //        target: -1
-                        //    }
-                        //},
-                        //"columnDefs": [{
-                        //    className: 'dtr-control',
-                        //    orderable: false,
-                        //    targets: -1
-                        //}],
-
                         "lengthChange": false,
                         "autoWidth": true,
                         "searching": true,
@@ -393,11 +380,25 @@
         }
     });
 
+    function loading() {
+        $('.loading').addClass('active');
+
+        setTimeout(function () {
+            $('.loading').removeClass('active');
+        }, 1200)
+    }
+
+    // Loading
+    $(window).on('load', function () {
+        loading();
+    });
+
 </script>
 
 <script type="text/javascript">
 
     $(document).ready(function () {
+
         //Initialize Select2 Elements
         $('.select2').select2();
 

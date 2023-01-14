@@ -6,6 +6,10 @@
     ViewData["Title"] = "Result of Inventory" + " " + DateTime.Now;
 }
 
+<div class="loading">
+    <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+</div>
+
 <div class="callout callout-danger notification">
     <p class="showMgs"></p>
 </div>
@@ -20,14 +24,14 @@
 <input type="hidden" id="stockVal" value="@Model.stockVal" />
 
 <div class="row">
-    <div class="col-lg-7">
-        <div class="box box-primary collapsed-box collapseses">
+    <div class="col-lg-12">
+        <div class="box box-primary collapseses">
         <div class="box-header with-border">
             <h3 class="box-title">Search</h3>
 
             <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                    <i class="fa fa-plus pluses"></i>
+                    <i class="fa fa-minus pluses"></i>
                 </button>
             </div>
             <!-- /.box-tools -->
@@ -99,9 +103,8 @@
         </div>
         <!-- /.box -->
     </div>
-    <div class="col-lg-6"></div>
 
-    <div class="col-xs-12">
+    <div class="col-lg-12">
         <div class="box box-primary">
             <div class="box-body">
                 <table id="tblInventory" class="table table-bordered table-hover" style="width:100%"></table>
@@ -114,10 +117,6 @@
 
 </div>
 <!-- /.row -->
-
-<div class="loading">
-    <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-</div>
 
 <div class="modal fade" id="modal-default">
     <div class="modal-dialog">
@@ -145,87 +144,31 @@
 
 <script type="text/javascript">
 
+    function setTimer() {
+        $('.loading').addClass('active');
+    }
+
+    function clearTimer() {
+        $('.loading').removeClass('active');
+    }
+
+    function resetTimer() {
+        var timer = null;
+
+        if (timer) { clearTimeout(timer) };
+            timer = setTimeout(function () {
+            clearTimer();
+        }, timer);
+
+    }
+
     var listInventory = [];
     let cols = [];
-
-    $.ajax({
-        url: '@Url.Action("getInventory","Inventory")',
-        type: 'GET',
-        dataType: 'JSON',
-        data: { whsCode: $('#whsCode').val(), itmsGrpCod: $('#itmsGrpCod').val(), itemName: $('#itemName').val(), categoryCode: $('#categoryCode').val(), subCategoryCode: $('#subCategoryCode').val(), stockVal: $('#stockVal').val() },
-        success: function (data) {
-
-            if(data == '') {
-                window.location.replace('@Url.Action("DataNotFound","Inventory")');
-            }else{
-                listInventory = [];
-
-                listInventory = data;
-                let inventoryRecord = listInventory[0];
-
-                let keys = Object.keys(inventoryRecord);
-
-                keys.forEach(function (k) {
-                    cols.push({
-                        title: k,
-                        data: k
-                    });
-
-                });
-
-                var table = $('#tblInventory').DataTable({
-                    "columns": cols,
-                    "responsive": {
-                        breakpoints: [
-                            { name: 'desktop', width: Infinity },
-                            { name: 'tablet', width: 1024 },
-                            { name: 'fablet', width: 768 },
-                            { name: 'phone', width: 480 }
-                        ]
-                    },
-                    "responsive": true,
-
-                    //"responsive": {
-                    //    details: {
-                    //        type: 'column',
-                    //        target: -1
-                    //    }
-                    //},
-                    //"columnDefs": [{
-                    //    className: 'dtr-control',
-                    //    orderable: false,
-                    //    targets: -1
-                    //}],
-
-                    "lengthChange": false, 
-                    "autoWidth": true, 
-                    "searching": true, 
-                    "paging": true,
-                    "scrollY": '60vh',
-                    "scrollX": true,
-                    "scrollCollapse": true,
-                    buttons: [
-                        { extend: 'excel', className: 'btn bg-olive btn-flat' }
-                    ],
-                    dom:
-                        "<'row'<'col-lg-0'l><'col-md-6'B><'col-md-6'f>>" +
-                        "<'row'<'col-lg-12'tr>>" +
-                        "<'row'<'col-lg-5'i><'col-md-7'p>>",
-                    lengthMenu: [
-                        [25]
-                    ],
-                });
-                
-                table.rows.add(listInventory).draw();
-
-            }
-        }
-
-    });
     
     $('#searchBtn').click(function(e) {
         e.preventDefault();
-        loading();
+
+        setTimer();
         $('.collapseses').addClass('collapsed-box');
         $('.pluses').removeClass('fa-minus');
         $('.pluses').addClass('fa-plus');
@@ -257,6 +200,9 @@
             type: 'GET',
             dataType: 'JSON',
             data: { whsCodes: warehouses, itmsGrpCods: brand, itemNames: codeorname, categoryCodes: category, subCategoryCodes: subcategory, stockVal: stock_value },
+            beforeSend: function () {
+                setTimer();
+            },
             success: function (data) {
                 //console.log(data);
                 
@@ -272,7 +218,7 @@
                         $('#tblInventory').DataTable().clear().destroy();
                         $('#tblInventory').html('');
                     }
-
+                    clearTimer();
                     
                 } else {
                     listInventory = [];
@@ -298,22 +244,21 @@
                     
                     var table = $('#tblInventory').DataTable({
                         "columns": cols,
-                        "columns": cols,
-                        "responsive": {
-                            breakpoints: [
-                                { name: 'desktop', width: Infinity },
-                                { name: 'tablet', width: 1024 },
-                                { name: 'fablet', width: 768 },
-                                { name: 'phone', width: 480 }
-                            ]
-                        },
+                        //"responsive": {
+                        //    breakpoints: [
+                        //        { name: 'desktop', 'responsive': false },
+                        //        { name: 'tablet', 'responsive': true },
+                        //        { name: 'fablet', 'responsive': true },
+                        //        { name: 'phone', 'responsive': true }
+                        //    ]
+                        //},
                         "responsive": true,
                         "lengthChange": false,
                         "autoWidth": true,
                         "searching": true,
                         "paging": true,
                         "scrollY": '60vh',
-                        "scrollX": true,
+                        //"scrollX": true,
                         "scrollCollapse": true,
                         buttons: [
                             { extend: 'excel', className: 'btn bg-olive btn-flat' }
@@ -329,7 +274,7 @@
                     
                     table.rows.add(listInventory).draw();
 
-                    $('th:nth-child(1)').css('width', '40px');
+                    resetTimer();
                 }
 
             }
@@ -378,19 +323,6 @@
         else {
             $('.to-top').removeClass('active');
         }
-    });
-
-    function loading() {
-        $('.loading').addClass('active');
-
-        setTimeout(function () {
-            $('.loading').removeClass('active');
-        }, 1200)
-    }
-
-    // Loading
-    $(window).on('load', function () {
-        loading();
     });
 
 </script>

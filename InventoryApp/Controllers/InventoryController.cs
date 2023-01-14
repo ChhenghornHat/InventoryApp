@@ -136,7 +136,7 @@ namespace InventoryApp.Controllers
                 LoginDb1 login = new LoginDb1(ConnectionString.Database);
                 if (login._errCode == 0)
                 {
-                    string query = "SELECT WhsCode, WhsName FROM OWHS";
+                    string query = "EXEC _USP_Warehouse";
                     login._Ad = new System.Data.SqlClient.SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
 
@@ -256,7 +256,7 @@ namespace InventoryApp.Controllers
 
                 if (login._errCode == 0)
                 {
-                    string query = ""+ConnectionString.QueryCategory+"="+code+"";
+                    string query = ""+ConnectionString.QueryCategory+" IN('"+code+"')";
                     login._Ad = new System.Data.SqlClient.SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
 

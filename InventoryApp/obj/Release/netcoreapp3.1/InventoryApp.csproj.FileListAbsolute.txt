@@ -1891,3 +1891,6 @@ C:\Users\Admin\source\repos\InventoryApp\InventoryApp\bin\Release\netcoreapp3.1\
 C:\Users\Admin\source\repos\InventoryApp\InventoryApp\bin\Release\netcoreapp3.1\wwwroot\lib\jquery-validation\dist\jquery.validate.min.js
 C:\Users\Admin\source\repos\InventoryApp\InventoryApp\bin\Release\netcoreapp3.1\wwwroot\lib\jquery\dist\jquery.js
 C:\Users\Admin\source\repos\InventoryApp\InventoryApp\bin\Release\netcoreapp3.1\wwwroot\lib\jquery\dist\jquery.min.js
+C:\Users\Admin\source\repos\InventoryApp\InventoryApp\obj\Release\netcoreapp3.1\Razor\Views\Admin\ViewDashboard.cshtml.g.cs
+C:\Users\Admin\source\repos\InventoryApp\InventoryApp\obj\Release\netcoreapp3.1\Razor\Views\Admin\ViewManageUser.cshtml.g.cs
+C:\Users\Admin\source\repos\InventoryApp\InventoryApp\obj\Release\netcoreapp3.1\Razor\Views\Shared\_AdminLayout.cshtml.g.cs
