@@ -2,14 +2,6 @@
     scroll-behavior: smooth;
 }
 
-div.container {
-    max-width: 1200px
-}
-
-td:active tr {
-    background-color: red;
-}
-
 .to-top {
     position: fixed;
     bottom: -200px;
@@ -40,11 +32,11 @@ th {
     white-space: nowrap;
 }
 
-th:nth-child(4),
-td:nth-child(4),
-td ul li:nth-child(2) {
-    display: none;
-}
+/*@media (max-width: 991px) {
+    td > ul > li:nth-child(2) {
+        background-color: red;
+    }
+}*/
 
 .notification {
     position: fixed;

@@ -216,7 +216,7 @@ namespace InventoryApp.Controllers
 
                 if (login._errCode == 0)
                 {
-                    string query = "SELECT Code, Name FROM [@category]";
+                    string query = ConnectionString.QueryCategory;
                     login._Ad = new System.Data.SqlClient.SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
 
@@ -256,7 +256,7 @@ namespace InventoryApp.Controllers
 
                 if (login._errCode == 0)
                 {
-                    string query = ""+ConnectionString.QueryCategory+" IN('"+code+"')";
+                    string query = ""+ConnectionString.QuerySubCategory+" IN('"+code+"')";
                     login._Ad = new System.Data.SqlClient.SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
 

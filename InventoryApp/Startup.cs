@@ -26,7 +26,12 @@ namespace InventoryApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddSession();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromDays(7);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddRazorPages().AddRazorRuntimeCompilation();
         }
@@ -64,6 +69,7 @@ namespace InventoryApp
 
             Models.Classes.ConnectionString.QueryDatabase = Configuration.GetSection("QueryDatabase").Value.ToString();
             Models.Classes.ConnectionString.QueryCategory = Configuration.GetSection("QueryCategory").Value.ToString();
+            Models.Classes.ConnectionString.QuerySubCategory = Configuration.GetSection("QuerySubCategory").Value.ToString();
             Models.Classes.ConnectionString.AppName = Configuration.GetSection("AppName").Value.ToString();
             Models.Classes.ConnectionString.AppInfo = Configuration.GetSection("AppInfo").Value.ToString();
             Models.Classes.ConnectionString.AppVersion = Configuration.GetSection("AppVersion").Value.ToString();

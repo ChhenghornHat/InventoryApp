@@ -128,7 +128,7 @@
                 <h4 class="modal-title">Space or Type</h4>
             </div>
             <div class="modal-body">
-                <textarea class="form-control" id="msg" rows="15" disabled></textarea>
+                <textarea class="form-control" id="msg" rows="15" readonly></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
@@ -143,6 +143,9 @@
 <script src="~/assets/bower_components/jquery/dist/jquery.min.js"></script>
 
 <script type="text/javascript">
+
+    var listInventory = [];
+    let cols = [];
 
     function setTimer() {
         $('.loading').addClass('active');
@@ -161,9 +164,6 @@
         }, timer);
 
     }
-
-    var listInventory = [];
-    let cols = [];
     
     $('#searchBtn').click(function(e) {
         e.preventDefault();
@@ -244,24 +244,18 @@
                     
                     var table = $('#tblInventory').DataTable({
                         "columns": cols,
-                        //"responsive": {
-                        //    breakpoints: [
-                        //        { name: 'desktop', 'responsive': false },
-                        //        { name: 'tablet', 'responsive': true },
-                        //        { name: 'fablet', 'responsive': true },
-                        //        { name: 'phone', 'responsive': true }
-                        //    ]
-                        //},
                         "responsive": true,
                         "lengthChange": false,
                         "autoWidth": true,
                         "searching": true,
                         "paging": true,
                         "scrollY": '60vh',
-                        //"scrollX": true,
                         "scrollCollapse": true,
+                        "columnDefs": [
+                            { visible: false, targets: 1 }
+                        ],
                         buttons: [
-                            { extend: 'excel', className: 'btn bg-olive btn-flat' }
+                            { extend: 'excel', className: 'btn bg-olive btn-flat'  },
                         ],
                         dom:
                             "<'row'<'col-md-0'l><'col-md-6'B><'col-md-6'f>>" +
@@ -274,7 +268,10 @@
                     
                     table.rows.add(listInventory).draw();
 
+                    //var datas = table.column(1).data();
+
                     resetTimer();
+
                 }
 
             }
@@ -286,6 +283,7 @@
     $('body').on('click', 'li', function () {
         var table = $(this).closest('table').DataTable();
         var text = table.row($(this).closest('li')).data()['SpaceOrType'];
+
         if (text != '') {
             $('#msg').text(text);
             $('.SpeceType').click();
@@ -328,10 +326,7 @@
 </script>
 
 <script type="text/javascript">
-
-    $(document).ready(function () {
-
-        //Initialize Select2 Elements
+    $(document).ready(function() {
         $('.select2').select2();
 
         $(':input[type="submit"]').prop('disabled', true);
@@ -343,7 +338,6 @@
             } else {
                 $('button[type="submit"]').prop('disabled', false);
             }
-
         });
 
         $('#category').change(function () {
@@ -429,8 +423,6 @@
                 }
             }
         });
-
     });
-
 </script>
 
