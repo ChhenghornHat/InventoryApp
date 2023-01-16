@@ -128,7 +128,7 @@
                 <h4 class="modal-title">Space or Type</h4>
             </div>
             <div class="modal-body">
-                <textarea class="form-control" id="msg" rows="15" disabled></textarea>
+                <textarea class="form-control" id="msg" rows="15" readonly></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
@@ -242,33 +242,116 @@
                         $('#tblInventory').html('');
                     }
                     
-                    var table = $('#tblInventory').DataTable({
-                        "columns": cols,
-                        "responsive": true,
-                        "lengthChange": false,
-                        "autoWidth": true,
-                        "searching": true,
-                        "paging": true,
-                        "scrollY": '60vh',
-                        "scrollCollapse": true,
-                        "columnDefs": [
-                            { visible: false, targets: 1 }
-                        ],
-                        buttons: [
-                            { extend: 'excel', className: 'btn bg-olive btn-flat'  },
-                        ],
-                        dom:
-                            "<'row'<'col-md-0'l><'col-md-6'B><'col-md-6'f>>" +
-                            "<'row'<'col-md-12'tr>>" +
-                            "<'row'<'col-md-5'i><'col-md-7'p>>",
-                        lengthMenu: [
-                            [25]
-                        ],
-                    });
+                    //var table = $('#tblInventory').DataTable({
+                    //    "columns": cols,
+                    //    //"responsive": true,
+                    //    "lengthChange": false,
+                    //    "autoWidth": true,
+                    //    "searching": true,
+                    //    "paging": true,
+                    //    "scrollY": '60vh',
+                    //    "scrollX": true,
+                    //    "scrollCollapse": true,
+                    //    "columnDefs": [
+                    //        { visible: false, targets: 1 }
+                    //    ],
+                    //    buttons: [
+                    //        { extend: 'excel', className: 'btn bg-olive btn-flat'  },
+                    //    ],
+                    //    dom:
+                    //        "<'row'<'col-md-0'l><'col-md-6'B><'col-md-6'f>>" +
+                    //        "<'row'<'col-md-12'tr>>" +
+                    //        "<'row'<'col-md-5'i><'col-md-7'p>>",
+                    //    lengthMenu: [
+                    //        [25]
+                    //    ],
+                    //});
                     
-                    table.rows.add(listInventory).draw();
+                    //table.rows.add(listInventory).draw();
 
-                    //var datas = table.column(1).data();
+                    //table.on('click', 'tr', function() {
+                    //    var data = table.row(this).data();
+                    //    // below some operations with the data
+                    //    // How can I set the row color as red?
+                    //    $(this).addClass('bg-green').siblings().removeClass('bg-green');
+                    //});
+
+                    function responsive(maxWidth) {
+                        if (maxWidth.matches) {
+                            var table = $('#tblInventory').DataTable({
+                                "columns": cols,
+                                "responsive": true,
+                                "lengthChange": false,
+                                "autoWidth": true,
+                                "searching": true,
+                                "paging": true,
+                                "scrollY": '60vh',
+                                "scrollX": false,
+                                "scrollCollapse": true,
+                                "columnDefs": [
+                                    { visible: false, targets: 1 }
+                                ],
+                                buttons: [
+                                    { extend: 'excel', className: 'btn bg-olive btn-flat' },
+                                ],
+                                dom:
+                                    "<'row'<'col-md-0'l><'col-md-6'B><'col-md-6'f>>" +
+                                    "<'row'<'col-md-12'tr>>" +
+                                    "<'row'<'col-md-5'i><'col-md-7'p>>",
+                                lengthMenu: [
+                                    [25]
+                                ],
+                            });
+
+                            table.rows.add(listInventory).draw();
+
+                            table.on('click', 'tr', function () {
+                                var data = table.row(this).data();
+                                // below some operations with the data
+                                // How can I set the row color as red?
+                                $(this).addClass('bg-green').siblings().removeClass('bg-green');
+                            });
+                        } else {
+                            var table = $('#tblInventory').DataTable({
+                                "columns": cols,
+                                "responsive": false,
+                                "lengthChange": false,
+                                "autoWidth": true,
+                                "searching": true,
+                                "paging": true,
+                                "scrollY": '60vh',
+                                "scrollX": true,
+                                "scrollCollapse": true,
+                                "columnDefs": [
+                                    { visible: false, targets: 1 }
+                                ],
+                                buttons: [
+                                    { extend: 'excel', className: 'btn bg-olive btn-flat' },
+                                ],
+                                dom:
+                                    "<'row'<'col-md-0'l><'col-md-6'B><'col-md-6'f>>" +
+                                    "<'row'<'col-md-12'tr>>" +
+                                    "<'row'<'col-md-5'i><'col-md-7'p>>",
+                                lengthMenu: [
+                                    [25]
+                                ],
+                            });
+
+                            table.rows.add(listInventory).draw();
+
+                            table.on('click', 'tr', function () {
+                                var data = table.row(this).data();
+                                // below some operations with the data
+                                // How can I set the row color as red?
+                                $(this).addClass('bg-green').siblings().removeClass('bg-green');
+                            });
+                        }
+                    }
+
+                    var maxWidth = window.matchMedia("(max-width: 991px)");
+
+                    responsive(maxWidth);
+                    maxWidth.addListener(responsive);
 
                     resetTimer();
 

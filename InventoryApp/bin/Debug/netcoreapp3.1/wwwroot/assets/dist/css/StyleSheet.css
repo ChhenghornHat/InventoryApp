@@ -32,12 +32,6 @@ th {
     white-space: nowrap;
 }
 
-/*@media (max-width: 991px) {
-    td > ul > li:nth-child(2) {
-        background-color: red;
-    }
-}*/
-
 .notification {
     position: fixed;
     top: -10%;
