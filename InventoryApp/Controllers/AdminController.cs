@@ -4,16 +4,16 @@ namespace InventoryApp.Controllers
 {
     public class AdminController : Controller
     {
-        public IActionResult ViewLogin()
+        public IActionResult AdminLogin()
         {
             return View();
         }
-        public IActionResult ViewDashboard()
+        public IActionResult AdminDashboard()
         {
             return View();
         }
 
-        public IActionResult ViewManageUser()
+        public IActionResult ManageUser()
         {
             return View();
         }

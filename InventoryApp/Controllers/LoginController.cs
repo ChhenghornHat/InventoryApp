@@ -20,7 +20,7 @@ namespace InventoryApp.Controllers
             } 
             else
             {
-                return RedirectToAction("ShowFilterData", "FilterData");
+                return RedirectToAction("ShowInventory", "Inventory");
             }
         }
         [HttpGet]

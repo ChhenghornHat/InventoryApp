@@ -8,8 +8,10 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.FileProviders;
 
 namespace InventoryApp
 {
@@ -28,7 +30,7 @@ namespace InventoryApp
             services.AddControllersWithViews();
             services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromDays(7);
+                options.IdleTimeout = TimeSpan.FromDays(1);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
@@ -50,7 +52,9 @@ namespace InventoryApp
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
+
             app.UseSession();
             app.UseRouting();
 
@@ -61,6 +65,7 @@ namespace InventoryApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Login}/{action=ViewLogin}/{id?}");
+                    // pattern: "{controller=Admin}/{action=AdminDashboard}/{id?}");
             });
             Models.Classes.ConnectionString.Constr = Configuration.GetSection("ConnectionString").Value.ToString();
             Models.Classes.ConnectionString.Server = Configuration.GetSection("ServerName").Value.ToString();
@@ -70,6 +75,7 @@ namespace InventoryApp
             Models.Classes.ConnectionString.QueryDatabase = Configuration.GetSection("QueryDatabase").Value.ToString();
             Models.Classes.ConnectionString.QueryCategory = Configuration.GetSection("QueryCategory").Value.ToString();
             Models.Classes.ConnectionString.QuerySubCategory = Configuration.GetSection("QuerySubCategory").Value.ToString();
+            Models.Classes.ConnectionString.ImageUrl = Configuration.GetSection("ImageUrl").Value.ToString();
             Models.Classes.ConnectionString.AppName = Configuration.GetSection("AppName").Value.ToString();
             Models.Classes.ConnectionString.AppInfo = Configuration.GetSection("AppInfo").Value.ToString();
             Models.Classes.ConnectionString.AppVersion = Configuration.GetSection("AppVersion").Value.ToString();

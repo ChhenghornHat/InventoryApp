@@ -10,7 +10,12 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net.Mime;
+using InventoryApp.Models.StoreImage;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace InventoryApp.Controllers
 {
@@ -27,9 +32,29 @@ namespace InventoryApp.Controllers
                 return RedirectToAction("ViewLogin", "Login");
             }
         }
-        public IActionResult DataNotFound()
+
+        public IActionResult CallImage(string folderName)
         {
-            return View();
+            List<StoreImage> storeImages = new List<StoreImage>();
+            var Path = ConnectionString.ImageUrl + folderName +"\\";
+            //var Path = ConnectionString.ImageUrl;
+            
+            DirectoryInfo place = new DirectoryInfo(Path);
+            FileInfo[] Files = place.GetFiles();
+
+            foreach(FileInfo i in Files)
+            {
+                StoreImage image = new StoreImage();
+                byte[] bytes = System.IO.File.ReadAllBytes(Path + i.Name);
+                image.ImageUrl = Path + i.Name;
+
+                string base64String = Convert.ToBase64String(bytes, 0, bytes.Length);
+                image.ImageName = "data:image/png;base64," + base64String;
+                
+                storeImages.Add(image);
+            }
+
+            return Ok(storeImages);
         }
         public IActionResult ShowInventory(string whsCode, string itmsGrpCod, string itemName, string categoryCode, string subCategoryCode, string stockVal)
         {

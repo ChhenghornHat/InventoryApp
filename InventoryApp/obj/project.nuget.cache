@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "kNHxIoc7x5O7tHFwLh12ndjK0huNowQE1gQSQv8lduT+KgbTMRuAKvdhCawB5ohDH9C7a6M3dN8AeXcABtr7ew==",
+  "dgSpecHash": "glXSMI0Y1CNWPN4hswrl/lNGGVZ71Eh6q6n+yxxycy5Pfi60/qu6+J7KOz7DDYa39Ku7YogM6/pH3p8FrHzO7w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Admin\\source\\repos\\InventoryApp\\InventoryApp\\InventoryApp.csproj",
+  "projectFilePath": "D:\\PTC-Computer\\InventoryApp\\InventoryApp\\InventoryApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.mvc.razor.extensions\\3.1.31\\microsoft.aspnetcore.mvc.razor.extensions.3.1.31.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.mvc.razor.runtimecompilation\\3.1.31\\microsoft.aspnetcore.mvc.razor.runtimecompilation.3.1.31.nupkg.sha512",
