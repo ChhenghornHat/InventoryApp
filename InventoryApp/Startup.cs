@@ -25,14 +25,12 @@ namespace InventoryApp
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddSession(options =>
-            {
+            services.AddSession(options => {
                 options.IdleTimeout = TimeSpan.FromDays(1);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
             });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddRazorPages().AddRazorRuntimeCompilation();
@@ -76,6 +74,8 @@ namespace InventoryApp
             Models.Classes.ConnectionString.QueryCategory = Configuration.GetSection("QueryCategory").Value.ToString();
             Models.Classes.ConnectionString.QuerySubCategory = Configuration.GetSection("QuerySubCategory").Value.ToString();
             Models.Classes.ConnectionString.ImageUrl = Configuration.GetSection("ImageUrl").Value.ToString();
+            Models.Classes.ConnectionString.DatabaseUrl = Configuration.GetSection("databaseURL").Value.ToString();
+            
             Models.Classes.ConnectionString.AppName = Configuration.GetSection("AppName").Value.ToString();
             Models.Classes.ConnectionString.AppInfo = Configuration.GetSection("AppInfo").Value.ToString();
             Models.Classes.ConnectionString.AppVersion = Configuration.GetSection("AppVersion").Value.ToString();

@@ -1,4 +1,5 @@
-﻿@*
+﻿@using InventoryApp.Models.Classes
+@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
@@ -41,23 +42,25 @@
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_1">
-                        <table class="table table-bordered">
-                            <thead>
-                            <tr>
-                                <th style="width: 10px">#</th>
-                                <th>Username</th>
-                                <th>IP Address</th>
-                                <th>City</th>
-                                <th>Browser Name</th>
-                                <th>Browser Version</th>
-                                <th>Logged in date</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>Username</th>
+                                    <th>IP Address</th>
+                                    <th>City</th>
+                                    <th>Browser Name</th>
+                                    <th>Browser Version</th>
+                                    <th>Logged in date</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <!-- /.tab-pane -->
                     <div class="tab-pane" id="tab_2">
@@ -137,7 +140,8 @@
 <script>
     
     const firebaseConfig = {
-        databaseURL: "https://inventorymanageuserdb-default-rtdb.asia-southeast1.firebasedatabase.app"
+        // databaseURL: "https://inventorymanageuserdb-default-rtdb.asia-southeast1.firebasedatabase.app"
+        databaseURL: '@ConnectionString.DatabaseUrl'
     }
     firebase.initializeApp(firebaseConfig)
     const database = firebase.database();
@@ -148,14 +152,14 @@
     var fetchedData = database.ref('inventory-user/');
     fetchedData.on('value', (snapshot) => {
         var data = snapshot.val();
-        var id = 0;
-        
+        var no = 0;
+        document.querySelector('.num-notification').textContent = snapshot.numChildren();
         var htmlData = '';
         for (var key in data) {
             var value = data[key];
             htmlData += `
                 <tr>
-                    <td>${++id}</td>
+                    <td>${++no}</td>
                     <td>${value.username}</td>
                     <td>${value.ip}</td>
                     <td>${value.city}</td>

@@ -18,27 +18,20 @@ namespace InventoryApp.Models.Classes
         public SqlConnection _Con { get { return Con; } set { Con = value; } }
         public SqlCommand _Cmd { get { return Cmd; } set { Cmd = value; } }
         public SqlDataAdapter _Ad { get { return Ad; } set { Ad = value; } }
-        public LoginDb1(string Database)
+        public LoginDb1(string database)
         {
-            ConnDb(Database);
+            ConnDb(database);
         }
 
-        private void ConnDb(string Database)
+        private void ConnDb(string database)
         {
             try
             {
                 string Server = ConnectionString.Server;
                 string UserId = ConnectionString.UserId;
                 string Password = ConnectionString.Password;
-                string ConnString = "Server = " + Server + ";Initial Catalog = " + Database + "; User id = "+UserId+";Password = " + Password + "";
+                string ConnString = "Server = " + Server + ";Initial Catalog = " + database + "; User id = "+UserId+";Password = " + Password + "";
 
-                //Query Database
-                string QueryDatabase = ConnectionString.QueryDatabase;
-                string QueryCategory = ConnectionString.QueryCategory;
-                string AppName = ConnectionString.AppName;
-                string AppInfo = ConnectionString.AppInfo;
-                string AppVersion = ConnectionString.AppVersion;
-                
                 _Con = new SqlConnection(ConnString);
                 if (_Con.State == System.Data.ConnectionState.Closed) { _Con.Open(); }
 
