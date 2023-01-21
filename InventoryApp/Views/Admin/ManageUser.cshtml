@@ -6,11 +6,6 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<input type="text" id="ip">
-<input type="text" id="city">
-<input type="text" id="browser">
-<input type="text" id="version">
-
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
@@ -47,26 +42,21 @@
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_1">
                         <table class="table table-bordered">
+                            <thead>
                             <tr>
                                 <th style="width: 10px">#</th>
                                 <th>Username</th>
                                 <th>IP Address</th>
                                 <th>City</th>
-                                <th>Open in</th>
+                                <th>Browser Name</th>
+                                <th>Browser Version</th>
                                 <th>Logged in date</th>
                                 <th>Action</th>
                             </tr>
-                            <tr>
-                                <td>1.</td>
-                                <td>Update software</td>
-                                <td>202.40.60.40</td>
-                                <td>Phnom Penh</td>
-                                <td>Chrome</td>
-                                <td>20/01/2023</td>
-                                <td>
-                                    <button class="badge bg-red">Logout</button>
-                                </td>
-                            </tr>
+                            </thead>
+                            <tbody>
+                            
+                            </tbody>
                         </table>
                     </div>
                     <!-- /.tab-pane -->
@@ -139,79 +129,50 @@
 </section>
 
 <script src="~/assets/bower_components/jquery/dist/jquery.min.js"></script>
-<script>
-    // fetch('https://ip-api.com/json/?fields=61439')
-    //         .then((res) => res.json())
-    //         .then((res) => console.log(res))
-    //        
-    
-    // fetch('https://ipapi.co/8.8.8.8/json/')
-    // .then(function(response) {
-    //   response.json().then(jsonData => {
-    //     console.log(jsonData);
-    //   });
-    // })
-    // .catch(function(error) {
-    //   console.log(error)
-    // });
-    
-    
-    // fetch('https://ipapi.co/json/?fields=61439')
-    // .then(function(response) {
-    //     response.text().then(txt => {
-    //         console.log(txt);
-    //     });
-    // })
-    // .catch(function(error) {
-    //     console.log(error)
-    // });
-    
-    const ipEl = document.getElementById('ip');
-    const cityEl = document.getElementById('city');
-    const browserEl = document.getElementById('browser');
-    const versionEl = document.getElementById('version');
-    
-    // Get IP and City
-    fetch('https://ipapi.co/json/?fields=61439')
-        .then((res) => res.json())
-        .then((res) => {
-            //ipEl.value = res.ip;
-            console.log(res.ip)
-            console.log(res.city)
-            ipEl.value = res.ip;
-            cityEl.value = res.city;
-        })
-    
-    // Get Browser
-    function get_browser() {
-        var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
-        if(/trident/i.test(M[1])){
-            tem=/\brv[ :]+(\d+)/g.exec(ua) || [];
-            return {name:'IE',version:(tem[1]||'')};
-        }
-        if(M[1]==='Chrome'){
-            tem=ua.match(/\bEdg\/(\d+)/)
-            if(tem!=null)   {return {name:'Edge(Chromium)', version:tem[1]};}
-            tem=ua.match(/\bOPR\/(\d+)/)
-            if(tem!=null)   {return {name:'Opera', version:tem[1]};}
-        }
-        M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
-        if((tem=ua.match(/version\/(\d+)/i))!=null) {M.splice(1,1,tem[1]);}
-        return {
-            name: M[0],
-            version: M[1]
-        };
-    }
 
-    var browser=get_browser(); // browser.name = 'Edge(Chromium)'
-                               // browser.version = '86'
-    // console.log(browser.name);
-    // console.log(browser.version);
+<!-- add firebase CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+
+<script>
     
-     browserEl.value = browser.name;
-     versionEl.value = browser.version;
-     
+    const firebaseConfig = {
+        databaseURL: "https://inventorymanageuserdb-default-rtdb.asia-southeast1.firebasedatabase.app"
+    }
+    firebase.initializeApp(firebaseConfig)
+    const database = firebase.database();
     
+    //const dataContainer = document.querySelector('tbody');
+    
+    // fetch data
+    var fetchedData = database.ref('inventory-user/');
+    fetchedData.on('value', (snapshot) => {
+        var data = snapshot.val();
+        var id = 0;
+        
+        var htmlData = '';
+        for (var key in data) {
+            var value = data[key];
+            htmlData += `
+                <tr>
+                    <td>${++id}</td>
+                    <td>${value.username}</td>
+                    <td>${value.ip}</td>
+                    <td>${value.city}</td>
+                    <td>${value.browser}</td>
+                    <td>${value.version}</td>
+                    <td>${value.date}</td>
+                    <td>
+                        <button class="badge bg-red">Logout</button>
+                    </td>
+                </tr>
+            `;
+            
+        }
+        
+        document.querySelector('tbody').innerHTML = htmlData;
+    })
+
     $(document).ready(function() {
         $('.manageUserSubNav').addClass('active');
     })

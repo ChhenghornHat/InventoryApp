@@ -64,8 +64,8 @@ namespace InventoryApp
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Login}/{action=ViewLogin}/{id?}");
-                    // pattern: "{controller=Admin}/{action=AdminDashboard}/{id?}");
+                    // pattern: "{controller=Login}/{action=ViewLogin}/{id?}");
+                    pattern: "{controller=Admin}/{action=AdminDashboard}/{id?}");
             });
             Models.Classes.ConnectionString.Constr = Configuration.GetSection("ConnectionString").Value.ToString();
             Models.Classes.ConnectionString.Server = Configuration.GetSection("ServerName").Value.ToString();

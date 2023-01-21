@@ -19,14 +19,6 @@
     </div>
 </div>
 
-<div class="callout callout-danger notification">
-    <p class="showMgs"></p>
-</div>
-
-<div class="showImg">
-
-</div>
-
 @* <input type="hidden" id="whsCode" value="@Model.whsCode"/> *@
 @* <input type="hidden" id="itmsGrpCod" value="@Model.itmsGrpCod"/> *@
 @* <input type="hidden" id="itemName" value="@Model.itemName"/> *@
@@ -249,8 +241,7 @@
                 setTimer();
             },
             success: function (data) {
-                //console.log(data);
-                
+
                 if (data == '') {
                     $('.showMgs').text('Data not found!');
                     $('.notification').addClass('active');
@@ -381,43 +372,6 @@
         });
     }
 
-    // var msg = 'The space or type is empty.';
-    // $(document).on('click', 'li', function () {
-    //     var table = $(this).closest('table').DataTable();
-    //     var text = table.row($(this).closest('li')).data()['SpaceOrType'];
-    //
-    //     if (text !== '') {
-    //         $('#msg').text(text);
-    //         $('#modal-space').modal('show');
-    //         $('.notification').removeClass('active');
-    //     } else {
-    //         $('.showMgs').text(msg);
-    //         $('.notification').addClass('active');
-    //         setTimeout(function() {
-    //             $('.notification').removeClass('active');
-    //             $('.showMgs').text('');
-    //         }, 5000);
-    //     }
-    // });
-
-    // $(document).on('dblclick', 'td', function () {
-    //     var table = $(this).closest('table').DataTable();
-    //     var text = table.row($(this).closest('tr')).data()['SpaceOrType'];
-    //
-    //     if (text !== '') {
-    //         $('#msg').text(text);
-    //         $('#modal-space').modal('show');
-    //         $('.notification').removeClass('active');
-    //     } else {
-    //         $('.showMgs').text(msg);
-    //         $('.notification').addClass('active');
-    //         setTimeout(function() {
-    //             $('.notification').removeClass('active');
-    //             $('.showMgs').text('');
-    //         }, 5000);        }
-    // });
-
-    
     $(document).on('dblclick', 'td', function() {
         var table = $(this).closest('table').DataTable();
         var folderName = table.row($(this).closest('tr')).data()['ItemCode'];
