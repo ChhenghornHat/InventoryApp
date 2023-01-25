@@ -56,7 +56,7 @@ th {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(2px);
     display: flex;
     justify-content: center;
@@ -196,6 +196,9 @@ th {
     width: 100%;
 }
 
-
-
+@media (max-width: 767px) {
+    .fixed .content-wrapper, .fixed .right-side {
+        padding-top: 50px !important;
+    }
+}
 

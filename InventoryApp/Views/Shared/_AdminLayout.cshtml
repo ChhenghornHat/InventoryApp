@@ -1,6 +1,7 @@
-﻿<!DOCTYPE html>
-
-<html>
+﻿@using InventoryApp.Models.Classes
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta name="viewport" content="width=device-width"/>
     <title>@ViewData["Title"] - InventoryApp</title>
@@ -28,7 +29,7 @@
     <!-- Google Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
-<body class="hold-transition skin-blue sidebar-mini">
+<body class="hold-transition skin-blue sidebar-mini fixed">
 <div class="wrapper">
     <header class="main-header">
         <!-- Logo -->
@@ -92,21 +93,19 @@
             <!-- sidebar menu: : style can be found in sidebar.less -->
             <ul class="sidebar-menu" data-widget="tree">
                 <li class="header">MAIN NAVIGATION</li>
-                <li class="active treeview">
-                    <a href="#">
+                <li class="dashboardSubNav">
+                    <a asp-controller="Admin" asp-action="AdminDashboard">
                         <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="manageUserSubNav">
+                    <a asp-controller="Admin" asp-action="ManageUser">
+                        <i class="fa fa-users"></i> <span>Manage users</span>
                         <span class="pull-right-container">
-                            <i class="fa fa-angle-left pull-right"></i>
+                            <small class="label pull-right bg-red new">3</small>
+                            <small class="label pull-right bg-blue total"></small>
                         </span>
                     </a>
-                    <ul class="treeview-menu">
-                        <li class="dashboardSubNav">
-                            <a asp-controller="Admin" asp-action="AdminDashboard"><i class="fa fa-circle-o"></i> Dashboard</a>
-                        </li>
-                        <li class="manageUserSubNav">
-                            <a asp-controller="Admin" asp-action="ManageUser"><i class="fa fa-circle-o"></i> Manage users</a>
-                        </li>
-                    </ul>
                 </li>
             </ul>
         </section>
@@ -122,9 +121,9 @@
 
     <footer class="main-footer">
         <div class="pull-right hidden-xs">
-            <b>Version</b> 2.4.18
+            <b>Version</b> 1.0
         </div>
-        <strong>Copyright &copy; 2014-2019 <a href="https://adminlte.io">AdminLTE</a>.</strong> All rights
+        <strong>Copyright &copy; PTC Computer Co., Ltd.</strong> All rights
         reserved.
     </footer>
 </div>
@@ -136,13 +135,42 @@
 <script src="~/assets/bower_components/jquery-ui/jquery-ui.min.js"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <script>
-        $.widget.bridge('uibutton', $.ui.button);
-    </script>
+    $.widget.bridge('uibutton', $.ui.button);
+</script>
 <!-- Bootstrap 3.3.7 -->
 <script src="~/assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- Bootstrap WYSIHTML5 -->
 <script src="~/assets/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
 <!-- AdminLTE App -->
 <script src="~/assets/dist/js/adminlte.min.js"></script>
+
+<!-- add firebase CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+
+<script type="text/javascript">
+
+    const firebaseConfig = {
+        // databaseURL: "https://inventorymanageuserdb-default-rtdb.asia-southeast1.firebasedatabase.app"
+        databaseURL: '@ConnectionString.DatabaseUrl'
+    }
+    firebase.initializeApp(firebaseConfig)
+    const database = firebase.database();
+    
+    //const dataContainer = document.querySelector('tbody');
+    
+    // fetch data
+    var fetchedData = database.ref('inventory-user/');
+    fetchedData.on('value', (snapshot) => {
+        var data = snapshot.val();
+        
+        var numChild = snapshot.numChildren();
+                
+        numChild > 0 ? document.querySelector('.total').textContent = numChild : document.querySelector('.total').textContent = 0;
+    });
+
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

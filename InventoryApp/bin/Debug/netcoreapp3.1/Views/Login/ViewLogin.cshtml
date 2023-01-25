@@ -93,7 +93,7 @@
         </form>
 
     </div>
-    <img src="~/logo/shadow.png" style="width: 100%; margin-top: -15px"/>
+    <img src="~/logo/shadow.png" style="width: 100%; margin-top: -15px" alt=""/>
     <!-- /.login-box-body -->
 </div>
 <!-- /.login-box -->
@@ -247,6 +247,7 @@
                         success: function(data) {
                             //console.log(data)
                             if(data == 0) {
+                                if (usern)
                                 sendData();
                                 
                                 setTimeout(function() {
@@ -291,8 +292,8 @@
                         $('option:nth-child(2)').attr('selected', true);
                     }
                 }
-            })
-        })
+            });
+        });
     </script>
 
 </body>
