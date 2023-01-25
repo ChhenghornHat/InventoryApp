@@ -32,13 +32,6 @@ namespace InventoryApp.Models.Classes
                 string Password = ConnectionString.Password;
                 string ConnString = "Server = " + Server + ";Initial Catalog = " + Database + "; User id = "+UserId+";Password = " + Password + "";
 
-                //Query Database
-                string QueryDatabase = ConnectionString.QueryDatabase;
-                string QueryCategory = ConnectionString.QueryCategory;
-                string AppName = ConnectionString.AppName;
-                string AppInfo = ConnectionString.AppInfo;
-                string AppVersion = ConnectionString.AppVersion;
-                
                 _Con = new SqlConnection(ConnString);
                 if (_Con.State == System.Data.ConnectionState.Closed) { _Con.Open(); }
 

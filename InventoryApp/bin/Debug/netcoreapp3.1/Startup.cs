@@ -76,6 +76,8 @@ namespace InventoryApp
             Models.Classes.ConnectionString.QueryCategory = Configuration.GetSection("QueryCategory").Value.ToString();
             Models.Classes.ConnectionString.QuerySubCategory = Configuration.GetSection("QuerySubCategory").Value.ToString();
             Models.Classes.ConnectionString.ImageUrl = Configuration.GetSection("ImageUrl").Value.ToString();
+            Models.Classes.ConnectionString.DatabaseUrl = Configuration.GetSection("DatabaseUrl").Value.ToString();
+            
             Models.Classes.ConnectionString.AppName = Configuration.GetSection("AppName").Value.ToString();
             Models.Classes.ConnectionString.AppInfo = Configuration.GetSection("AppInfo").Value.ToString();
             Models.Classes.ConnectionString.AppVersion = Configuration.GetSection("AppVersion").Value.ToString();

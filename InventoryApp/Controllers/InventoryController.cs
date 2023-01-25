@@ -85,7 +85,7 @@ namespace InventoryApp.Controllers
 
                 if (login._errCode == 0)
                 {
-                    login._Cmd = new System.Data.SqlClient.SqlCommand("exec _USP_Inventory_Search " + whsCode + ",'" + ClsPriceList.PriceList + "'," + itmsGrpCod + "," + itemName + "," + categoryCode + "," + subCategoryCode + ","+stockVal+"", login._Con);
+                    login._Cmd = new System.Data.SqlClient.SqlCommand("EXEC _USP_Inventory_Search " + whsCode + ",'" + ClsPriceList.PriceList + "'," + itmsGrpCod + "," + itemName + "," + categoryCode + "," + subCategoryCode + ","+stockVal+"", login._Con);
                     login._Ad = new System.Data.SqlClient.SqlDataAdapter(login._Cmd);
                     login._Cmd.ExecuteNonQuery();
                     login._Ad.Fill(dt);
