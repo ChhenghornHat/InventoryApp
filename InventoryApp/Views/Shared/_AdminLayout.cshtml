@@ -160,7 +160,7 @@
     //const dataContainer = document.querySelector('tbody');
     
     // fetch data
-    var fetchedData = database.ref('inventory-user/');
+    var fetchedData = database.ref('inventory-users/');
     fetchedData.on('value', (snapshot) => {
         var data = snapshot.val();
         

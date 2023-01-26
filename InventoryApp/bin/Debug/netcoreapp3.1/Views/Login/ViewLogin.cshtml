@@ -66,6 +66,9 @@
             <div class="form-group has-feedback">
                 <input type="hidden" class="form-control" id="date">
             </div>
+            <div class="test">
+                
+            </div>
             <div class="form-group has-errors">
                 <select class="form-control" id="select_company">
                     <option value="">-- Select Company --</option>
@@ -124,7 +127,7 @@
             var version = document.querySelectorAll('input')[5];
             var date = document.querySelectorAll('input')[6];
             
-            var listRef = database.ref('inventory-user/');
+            var listRef = database.ref('inventory-users/');
             var newRef = listRef.push();
             newRef.set({
                 'username': username.value,
@@ -227,6 +230,22 @@
 
         $(document).ready(function() {
             
+            // Fetch to update
+            var fetchedData = database.ref('inventory-users/')
+            fetchedData.on('value', (snapshot) => {
+                var data = snapshot.val();
+                var test = snapshot.exists();
+                var b = snapshot.child("-NMffEGVjHywMzCkVqF1/username").numChildren();
+                // for (var key in data) {
+                //     var value = data[key];
+                //     console.log(value.username)
+                //     //document.querySelector('.test').append(`<input type="text" value="${value.username}">`)
+                //     //$(`<input type="text" value="${value.username}">`).appendTo('.test');
+                // }
+                console.log(test);
+                console.log(b)
+            });
+            
             var form = $('form');
             form.submit(function(e) {
                 
@@ -247,9 +266,8 @@
                         success: function(data) {
                             //console.log(data)
                             if(data == 0) {
-                                if (usern)
                                 sendData();
-                                
+
                                 setTimeout(function() {
                                     window.location.replace('@Url.Action("ShowInventory", "Inventory")');
                                 }, 2500);
@@ -287,10 +305,10 @@
                 dataType: 'JSON',
                 success: function(data) {
                     //console.log(data);
-                    for(i = 0;i < data.length;i++){
+                    for(let i = 0;i < data.length;i++){
                         $('#select_company').append('<option value=' + data[i].dbName + '>' + data[i].cmpName + '</option>');
-                        $('option:nth-child(2)').attr('selected', true);
                     }
+                    $('option:nth-child(2)').attr('selected', true);
                 }
             });
         });

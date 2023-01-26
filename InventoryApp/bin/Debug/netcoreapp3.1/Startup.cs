@@ -28,6 +28,7 @@ namespace InventoryApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromDays(1);
@@ -55,6 +56,7 @@ namespace InventoryApp
 
             app.UseStaticFiles();
 
+            app.UseCookiePolicy();
             app.UseSession();
             app.UseRouting();
 

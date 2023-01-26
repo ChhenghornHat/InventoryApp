@@ -53,7 +53,6 @@
                                     <th>Browser Name</th>
                                     <th>Browser Version</th>
                                     <th>Logged in date</th>
-                                    <th>Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -149,7 +148,7 @@
     //const dataContainer = document.querySelector('tbody');
 
     // fetch data
-    var fetchedData = database.ref('inventory-user/');
+    var fetchedData = database.ref('inventory-users/');
     fetchedData.on('value', (snapshot) => {
         var data = snapshot.val();
         var no = 0;
@@ -166,12 +165,8 @@
                     <td>${value.browser}</td>
                     <td>${value.version}</td>
                     <td>${value.date}</td>
-                    <td>
-                        <button class="badge bg-red">Logout</button>
-                    </td>
                 </tr>
             `;
-
         }
         
         var numChild = snapshot.numChildren();
