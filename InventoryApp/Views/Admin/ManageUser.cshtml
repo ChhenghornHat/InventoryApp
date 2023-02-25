@@ -1,10 +1,8 @@
 ﻿@using InventoryApp.Models.Classes
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+
 @{
     ViewData["Title"] = "Admin Dashboard";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "_AdminLayout";
 }
 
 <!-- Content Header (Page header) -->
@@ -133,50 +131,50 @@
 <script src="~/assets/bower_components/jquery/dist/jquery.min.js"></script>
 
 <!-- add firebase CDN -->
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+@* <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script> *@
+@* <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script> *@
 
 <script type="text/javascript">
     
-    const firebaseConfig = {
-        // databaseURL: "https://inventorymanageuserdb-default-rtdb.asia-southeast1.firebasedatabase.app"
-        databaseURL: '@ConnectionString.DatabaseUrl'
-    }
-    firebase.initializeApp(firebaseConfig)
-    const database = firebase.database();
-
-    //const dataContainer = document.querySelector('tbody');
-
-    // fetch data
-    var fetchedData = database.ref('inventory-users/');
-    fetchedData.on('value', (snapshot) => {
-        var data = snapshot.val();
-        var no = 0;
-        var htmlData = '';
-
-        for (var key in data) {
-            var value = data[key];
-            htmlData += `
-                <tr>
-                    <td>${++no}</td>
-                    <td>${value.username}</td>
-                    <td>${value.ip}</td>
-                    <td>${value.city}</td>
-                    <td>${value.browser}</td>
-                    <td>${value.version}</td>
-                    <td>${value.date}</td>
-                </tr>
-            `;
-        }
-        
-        var numChild = snapshot.numChildren();
-        
-        numChild > 0 ? document.querySelector('.total').textContent = numChild : document.querySelector('.total').textContent = 0;
-
-        document.querySelector('tbody').innerHTML = htmlData;
-    });
+    // const firebaseConfig = {
+    //     // databaseURL: "https://inventorymanageuserdb-default-rtdb.asia-southeast1.firebasedatabase.app"
+    //     databaseURL: ''
+    // }
+    // firebase.initializeApp(firebaseConfig)
+    // const database = firebase.database();
+    //
+    // //const dataContainer = document.querySelector('tbody');
+    //
+    // // fetch data
+    // var fetchedData = database.ref('inventory-users/');
+    // fetchedData.on('value', (snapshot) => {
+    //     var data = snapshot.val();
+    //     var no = 0;
+    //     var htmlData = '';
+    //
+    //     for (var key in data) {
+    //         var value = data[key];
+    //         htmlData += `
+    //             <tr>
+    //                 <td>${++no}</td>
+    //                 <td>${value.username}</td>
+    //                 <td>${value.ip}</td>
+    //                 <td>${value.city}</td>
+    //                 <td>${value.browser}</td>
+    //                 <td>${value.version}</td>
+    //                 <td>${value.date}</td>
+    //             </tr>
+    //         `;
+    //     }
+    //    
+    //     var numChild = snapshot.numChildren();
+    //    
+    //     numChild > 0 ? document.querySelector('.total').textContent = numChild : document.querySelector('.total').textContent = 0;
+    //
+    //     document.querySelector('tbody').innerHTML = htmlData;
+    // });
 
     $(document).ready(function() {
         $('.manageUserSubNav').addClass('active');
-    })
+    });
 </script>

@@ -28,25 +28,9 @@
     opacity: 1;
 }
 
-th {
+th, td {
     white-space: nowrap;
 }
-
-.notification {
-    position: fixed;
-    top: -10%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 99999999;
-    transition: all 0.3s ease;
-    padding: 8px;
-    white-space: nowrap;
-}
-
-.notification.active {
-    top: 7.5%;
-}
-
 
 /*Loading*/
 .loading {

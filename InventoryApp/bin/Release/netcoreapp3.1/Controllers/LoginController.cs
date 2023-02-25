@@ -7,62 +7,99 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
+using InventoryApp.Models.Username;
 
 namespace InventoryApp.Controllers
 {
     public class LoginController : Controller
     {
-        public IActionResult ViewLogin()
+        public IActionResult Index()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserId"))) 
+            var role = HttpContext.Session.GetInt32("Role");
+            if (role == 1)
             {
-                return View();
-            } 
+                return RedirectToAction("InvLog", "Admin");
+            }
+            else if (role == 0)
+            {
+                return RedirectToAction("Index", "Inventory");
+            }
             else
             {
-                return RedirectToAction("ShowFilterData", "FilterData");
+                return View();
             }
         }
+        
         [HttpGet]
-        public IActionResult PostLogin(string usercode, string password, string database)
+        public IActionResult PostLogin(string usercode, string password, string database, string ip, string cmpName)
         {
-            int Result = 1;
-            ConnectionString.Database = database;
+            int result = 1;
+            HttpContext.Session.SetString("Database",database);
+            //ConnectionString.Database = database;
             DataTable dt = new DataTable();
             LoginDb1 login = new LoginDb1(database);
             if (login._errCode == 0)
             {
                 try
                 {
-                    //string query = "SELECT * FROM [@USERLOGIN] WHERE (Code IN('" + usercode + "') AND Name IN('" + password + "'))";
-                    string query = "EXEC _USP_User_Inventory '"+usercode+"',"+password+"";
-                    login._Ad = new System.Data.SqlClient.SqlDataAdapter(query, login._Con);
+                    string query = "EXEC _USP_User_Inventory '" + usercode + "'," + password + "";
+                    login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
+                    login._Con.Close();
 
                     foreach (DataRow row in dt.Rows)
                     {
-                        HttpContext.Session.SetString("UserId", usercode);
-                        ClsPriceList.PriceList = row["U_Price"].ToString();
-                        Result = 0;
+                        HttpContext.Session.SetString("U_Price", row["U_Price"].ToString());
+                        HttpContext.Session.SetString("UserCode", usercode);
+                        HttpContext.Session.SetString("Username", row["UserName"].ToString());
+                        HttpContext.Session.SetString("CompanyName", cmpName);
+                        HttpContext.Session.SetString("Ip", ip);
+                        HttpContext.Session.SetInt32("Role", Convert.ToInt32(row["Role"].ToString()));
+
+                        result = 0;
                     }
                 }
                 catch (Exception)
                 {
-                    Result = 1;
+                    result = 1;
+                }
+                finally
+                {
+                    LoginDb2 loginDb2 = new LoginDb2();
+                    var username = HttpContext.Session.GetString("Username");
+                    try
+                    {
+                        string query = "login";
+                        loginDb2._Cmd = new SqlCommand(query, loginDb2._Con);
+                        loginDb2._Cmd.CommandType = CommandType.StoredProcedure;
+                        loginDb2._Cmd.Parameters.AddWithValue("@UserCode", usercode);
+                        loginDb2._Cmd.Parameters.AddWithValue("@UserName", username);
+                        loginDb2._Cmd.Parameters.AddWithValue("@IpAddress", ip);
+                        loginDb2._Cmd.Parameters.AddWithValue("@Company", cmpName);
+
+                        loginDb2._Cmd.ExecuteNonQuery();
+                        loginDb2._Con.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    
                 }
             } 
             else
             {
                 HttpContext.Session.SetString("UserId", "");
-                Result = login._errCode;
+                result = login._errCode;
             }
-            return Ok(Result);   
+            return Ok(result);
         }
         
-        public IActionResult getCompanyName()
+        public IActionResult GetCompanyName()
         {
             List<ClsCompanyName> lstCompanyName = new List<ClsCompanyName>();
-            ClsCompanyName compayName;
+            ClsCompanyName companyName;
 
             ReturnError lstErr = new ReturnError();
             try
@@ -73,17 +110,17 @@ namespace InventoryApp.Controllers
                 if (login._errCode == 0)
                 {
                     string query = ConnectionString.QueryDatabase;
-                    login._Ad = new System.Data.SqlClient.SqlDataAdapter(query, login._Con);
+                    login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
 
                     foreach(DataRow row in dt.Rows)
                     {
-                        compayName = new ClsCompanyName();
+                        companyName = new ClsCompanyName();
 
-                        compayName.dbName = row[0].ToString();
-                        compayName.cmpName = row[1].ToString();
+                        companyName.dbName = row[0].ToString();
+                        companyName.cmpName = row[1].ToString();
 
-                        lstCompanyName.Add(compayName);
+                        lstCompanyName.Add(companyName);
                     }
                 } 
                 else
@@ -102,8 +139,8 @@ namespace InventoryApp.Controllers
 
         public IActionResult Logout()
         {
-            HttpContext.Session.SetString("UserId", "");
-            return RedirectToAction("ViewLogin", "Login");
+            HttpContext.Session.Remove("Role");
+            return RedirectToAction("Index", "Login");
         }
     }
 }

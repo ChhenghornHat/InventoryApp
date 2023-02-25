@@ -1,0 +1,590 @@
+﻿
+@{
+    ViewData["Title"] = "Result of Inventory" + " " + DateTime.Now;
+}
+
+@* <style> *@
+@*     td { *@
+@*         white-space: nowrap; *@
+@*     } *@
+@*       *@
+@*     td.wrapok { *@
+@*         white-space:normal *@
+@*     } *@
+@* </style> *@
+
+<div class="loading">
+    <div class="lds-roller">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="box box-primary collapseses">
+            <div class="box-header with-border">
+                <h3 class="box-title">Search</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-minus pluses"></i>
+                    </button>
+                </div>
+                <!-- /.box-tools -->
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label>WareHouse</label>
+                            <select class="form-control select2" id="whsCodes" multiple="multiple" data-placeholder="Select a State" style="width: 100%;" required>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label>Stock</label><br/>
+                            <input type="radio" name="in_stock" class="radioBtnClass" id="zero" value="0" checked/>
+                            <label style="font-weight: 500" for="zero">Default</label> |
+                            <input type="radio" name="in_stock" class="radioBtnClass" id="one" value="1"/>
+                            <label style="font-weight: 500" for="one">In-stock Only</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Choose Brand</label>
+                            <select class="form-control select2" id="brand" style="width: 100%;">
+                                <option value="0" selected="selected">Choose Brand</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Choose Category</label>
+                            <select class="form-control select2" id="category" style="width: 100%;">
+                                <option value="0" selected="selected">All</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Choose Sub Category</label>
+                            <select class="form-control select2" id="subcategory" style="width: 100%;">
+                                <option value="0" selected="selected">All</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label for="codeorname">Item Code or Name</label>
+                            <input type="text" class="form-control" id="codeorname" placeholder="Enter item code or name">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2">
+                        <label style="visibility: hidden">Search</label>
+                        <button type="submit" class="btn btn-primary btn-flat" id="searchBtn" style="width:100%"><small class="fa fa-search"></small> Search</button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+
+    <div class="col-lg-12">
+        <div class="box box-primary">
+            <div class="box-body">
+                <table id="tblInventory" class="table table-bordered " style="width:100%"></table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+    <!-- /.col -->
+
+</div>
+<!-- /.row -->
+
+<div class="modal fade" id="modal-space">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Image and Space</h4>
+            </div>
+            <div class="modal-body">
+                <!-- Swiper -->
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper">
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+                <br>
+                <textarea class="form-control" id="space" rows="15" readonly></textarea>
+                <h4 class="space-msg"></h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger close-modal" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+
+<!-- Initialize Swiper -->
+<script>
+    var swiper = new Swiper(".mySwiper", {
+        effect: "coverflow",
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: "auto",
+        autoplay: {
+            delay: 2500,
+            disableOnInteraction: false,
+        },
+        coverflowEffect: {
+            rotate: 50,
+            stretch: 0,
+            depth: 100,
+            modifier: 1,
+            slideShadows: true,
+        },
+        pagination: {
+            el: ".swiper-pagination",
+        },
+    });
+</script>
+
+<script src="~/assets/bower_components/jquery/dist/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    let listInventory = [];
+    let cols = [];
+
+    function setTimer() {
+        $('.loading').addClass('active');
+    }
+
+    function clearTimer() {
+        $('.loading').removeClass('active');
+    }
+
+    function resetTimer() {
+        let timer = null;
+
+        if (timer) { clearTimeout(timer) }
+            timer = setTimeout(function () {
+            clearTimer();
+        }, timer);
+
+    }
+    
+    $('#searchBtn').click(function(e) {
+        e.preventDefault();
+
+        $('.collapseses').addClass('collapsed-box');
+        $('.pluses').removeClass('fa-minus');
+        $('.pluses').addClass('fa-plus');
+        loadInventory();
+        InvLog();
+    });
+
+    let stock_value = 0;
+    $("input[type='radio'].radioBtnClass").change(function () {
+        if ($("input[type='radio'].radioBtnClass").is(':checked')) {
+            stock_value = $("input[type='radio'].radioBtnClass:checked").val();
+        }
+    });
+  
+    function loadInventory() {
+        
+        let warehouse = $('#whsCodes').val();
+        let brand = $('#brand').val();
+        let category = $('#category').val();
+        let subcategory = $('#subcategory').val();
+        let codeorname = $('#codeorname').val();
+
+        let warehouses = warehouse.toString();
+        if (codeorname === "") {
+            codeorname = 'empty';
+        }
+        
+        $.ajax({
+            url: '@Url.Action("GetInventory", "Inventory")',
+            type: 'GET',
+            dataType: 'JSON',
+            data: { whsCodes: warehouses, itmsGrpCods: brand, itemNames: codeorname, categoryCodes: category, subCategoryCodes: subcategory, stockVal: stock_value },
+            beforeSend: function () {
+                setTimer();
+            },
+            success: function (data) {
+                            //console.log(data);
+                            
+                if (data == "") {
+                    if ($.fn.DataTable.isDataTable("#tblInventory")) {
+                        $('#tblInventory').DataTable().clear().destroy();
+                        $('#tblInventory').html('');
+                    }
+                    $('#tblInventory').html('<h4 class="text-danger text-center">No matching records found!</h4>');
+                    clearTimer();
+                    
+                } else {
+                    $('#tblInventory').html('');
+                    listInventory = [];
+
+                    listInventory = data;
+                    let inventoryRecord = listInventory[0];
+
+                    let keys = Object.keys(inventoryRecord);
+
+                    cols = [];
+                    keys.forEach(function (k) {
+                        cols.push({
+                            title: k,
+                            data: k
+                        });
+
+                    });
+                    
+                    if ($.fn.DataTable.isDataTable("#tblInventory")) {
+                        $('#tblInventory').DataTable().clear().destroy();
+                        $('#tblInventory').html('');
+                    }
+
+                    function responsive(maxWidth) {
+                        if ($.fn.DataTable.isDataTable("#tblInventory")) {
+                            $('#tblInventory').DataTable().clear().destroy();
+                            $('#tblInventory').html('');
+                        }
+                        if (maxWidth.matches) {
+                            let table = $('#tblInventory').DataTable({
+                                "columns": cols,
+                                "responsive": true,
+                                "lengthChange": false,
+                                "autoWidth": true,
+                                "searching": false,
+                                "paging": true,
+                                "scrollY": '50vh',
+                                "scrollX": false,
+                                "scrollCollapse": true,
+                                "columnDefs": [
+                                    { visible: false, targets: 1 },
+                                    //{targets:["ItemName"], class:"wrapok"}
+                                ],
+                                buttons: [
+                                    { extend: 'excel', className: 'btn bg-olive btn-flat' },
+                                ],
+                                dom:
+                                    "<'row'<'col-md-0'l><'col-md-6'B><'col-md-6'f>>" +
+                                    "<'row'<'col-md-12'tr>>" +
+                                    "<'row'<'col-md-5'i><'col-md-7'p>>",
+                            });
+
+                            table.rows.add(listInventory).draw();
+                            
+                            console.log(itemName);
+
+                            table.on('click', 'tr', function () {
+                                //var data = table.row(this).data();
+                                // below some operations with the data
+                                // How can I set the row color as red?
+                                $(this).addClass('bg-green').siblings().removeClass('bg-green');
+                            });
+                        } else {
+                            if ($.fn.DataTable.isDataTable("#tblInventory")) {
+                                $('#tblInventory').DataTable().clear().destroy();
+                                $('#tblInventory').html('');
+                            }
+                            var table = $('#tblInventory').DataTable({
+                                "columns": cols,
+                                "responsive": false,
+                                "lengthChange": false,
+                                "autoWidth": true,
+                                "searching": true,
+                                "paging": false,
+                                "scrollY": '50vh',
+                                "scrollX": true,
+                                "scrollCollapse": true,
+                                "columnDefs": [
+                                    { visible: false, targets: 1 }
+                                ],
+                                buttons: [
+                                    { extend: 'excel', className: 'btn bg-olive btn-flat' },
+                                ],
+                                dom:
+                                    "<'row'<'col-md-0'l><'col-md-6'B><'col-md-6'f>>" +
+                                    "<'row'<'col-md-12'tr>>" +
+                                    "<'row'<'col-md-5'i><'col-md-7'p>>",
+                            });
+
+                            table.rows.add(listInventory).draw();
+
+                            table.on('click', 'tr', function () {
+                                //var data = table.row(this).data();
+                                // below some operations with the data
+                                // How can I set the row color as red?
+                                $(this).addClass('bg-green').siblings().removeClass('bg-green');
+                            });
+                        }
+                    }
+
+                    var maxWidth = window.matchMedia("(max-width: 768px)");
+
+                    responsive(maxWidth);
+                    maxWidth.addListener(responsive);
+
+                    resetTimer();
+
+                }
+
+            }
+
+        });
+    }
+
+    $(document).on('dblclick', 'td', function() {
+        var table = $(this).closest('table').DataTable();
+        var folderName = table.row($(this).closest('tr')).data()['ItemCode'];
+        var space = table.row($(this).closest('tr')).data()['SpaceOrType'];
+        
+        $('#modal-space').modal({
+            backdrop: 'static',
+            keyboard: true,
+            show: true
+        });
+        if (space !== "") {
+            $('#space').css('display', 'block');
+            $('#space').text(space);
+            $('.space-msg').text('');
+        } else {
+            $('#space').css('display', 'none');
+            $('.space-msg').text('No space or type');
+        }
+        
+        $.ajax({
+            url: '@Url.Action("CallImage", "Inventory")',
+            type: 'GET',
+            dataType: 'JSON',
+            data: {folderName: folderName},
+            beforeSend: function() {
+                setTimer();
+            },
+            success: function(data) {
+                resetTimer();
+                for (let i = 0;i < data.length;i++) {
+                    $(`<div class="swiper-slide">
+                           <img src="${data[i].imageName}"/>
+                       </div>`).appendTo('.swiper-wrapper');
+                }
+           },
+           error: function(data){
+               resetTimer();
+               $(`<div class="swiper-slide">
+                  <h3>No image found!</h3>
+              </div>`).appendTo('.swiper-wrapper');
+           }
+        });
+        
+        $('.close-modal, .close').click(function() {
+            $('.swiper-slide').remove();
+        });
+        
+    });
+    
+    $(document).on('click', 'li', function() {
+        var table = $(this).closest('table').DataTable();
+        var folderName = table.row($(this).closest('li')).data()['ItemCode'];
+        var space = table.row($(this).closest('li')).data()['SpaceOrType'];
+        
+        $('#modal-space').modal({
+            backdrop: 'static',
+            keyboard: true,
+            show: true
+        });
+        if (space !== "") {
+            $('#space').css('display', 'block');
+            $('#space').text(space);
+            $('.space-msg').text('');
+        } else {
+            $('#space').css('display', 'none');
+            $('.space-msg').text('No space or type');
+        }
+        
+        $.ajax({
+            url: '@Url.Action("CallImage", "Inventory")',
+            type: 'GET',
+            dataType: 'JSON',
+            data: {folderName: folderName},
+            beforeSend: function() {
+                setTimer();
+            },
+            success: function(data) {
+                resetTimer();
+                for (let i = 0;i < data.length;i++) {
+                    $(`<div class="swiper-slide">
+                           <img src="${data[i].imageName}" alt="img-slide"/>
+                       </div>`).appendTo('.swiper-wrapper');
+                }
+           },
+           error: function(){
+               resetTimer();
+               $(`<div class="swiper-slide">
+                  <h3>No image found!</h3>
+              </div>`).appendTo('.swiper-wrapper');
+           }
+        });
+        
+        $('.close-modal, .close').click(function() {
+            $('.swiper-slide').remove();
+        });
+        
+    });
+    
+    function InvLog() {
+        
+        $.ajax({
+            url: '@Url.Action("IvnLog", "Inventory")',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {brand: $('#brand option:selected').text(), category: $('#category option:selected').text(), subCategory: $('#subcategory option:selected').text(), code: $('#codeorname').val()},
+            beforeSend: function() {
+                console.log("Loading...");
+            },
+            success: function(data) {
+                console.log(data)
+            }
+        });
+    }
+
+    $(window).scroll(function() {
+        let scrollTop = $(window).scrollTop();
+        if(scrollTop > 50) {
+            $('.to-top').addClass('active');        } 
+        else {
+            $('.to-top').removeClass('active');
+        }
+    });
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.select2').select2();
+
+        $(':input[type="submit"]').prop('disabled', true);
+
+        $('#brand').change(function () {
+            let category = $('#category').val();
+            if ($(this).val() === '0' && category === '0') {
+                $('button[type="submit"]').prop('disabled', true);
+            } else {
+                $('button[type="submit"]').prop('disabled', false);
+            }
+        });
+
+        $('#category').change(function () {
+            let brand = $('#brand').val();
+            if ($(this).val() === '0' && brand === '0') {
+                $('button[type="submit"]').prop('disabled', true);
+            } else {
+                $('button[type="submit"]').prop('disabled', false);
+            }
+        });
+
+        $('#category').change(function () {
+            var id = $('#category').val();
+            $.ajax({
+                url: '@Url.Action("GetCategoryFilter", "Inventory")',
+                type: 'GET',
+                dataType: 'JSON',
+                data: { code: id },
+                success: function (data) {
+                    $('#subcategory').empty();
+                    $('#subcategory').append('<option value="0" selected="selected">Choose sub category</option>');
+                    for (i = 0; i < data.length; i++) {
+                        $('#subcategory').append('<option value="' + data[i].subCategoryCode + '">' + data[i].subCategoryName + '</option>');
+                    }
+                }
+            })
+        });
+
+        $('input[type="text"]').keyup(function () {
+            var value = $(this).val();
+            let brand = $('#brand').val();
+            let category = $('#category').val();
+            if (value.length >= 3 && value != '') {
+                $(':input[type="submit"]').prop('disabled', false);
+            } else {
+                if (brand != '0' || category != '0') {
+                    $(':input[type="submit"]').prop('disabled', false);
+                } else {
+                    $(':input[type="submit"]').prop('disabled', true);
+                }
+            }
+
+        });
+
+        //Fetch Warehouse
+        $.ajax({
+            url: '@Url.Action("GetWareHouse", "Inventory")',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function (data) {
+                //console.log(data)
+                for (i = 0; i < data.length; i++) {
+                    //console.log(data[i].whsCode);
+                    $('#whsCodes').append('<option value="' + data[i].whsCode + '" selected>' + data[i].whsName + '</option>');
+                }
+            }
+        });
+
+        //Fetch Brand
+        $.ajax({
+            url: '@Url.Action("GetBrand", "Inventory")',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    //console.log(data[i].itmsGrpCod);
+                    $('#brand').append('<option value="' + data[i].itmsGrpCod + '">' + data[i].itmsGrpNam + '</option>');
+                }
+            }
+        });
+
+        //Fetch Category
+        $.ajax({
+            url: '@Url.Action("GetCategory", "Inventory")',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function (data) {
+                //console.log(data);
+                for (var i = 0; i < data.length; i++) {
+                    //console.log(data[i].code);
+                    $('#category').append('<option value="' + data[i].categoryCode + '">' + data[i].categoryName + '</option>');
+                }
+            }
+        });
+    });
+</script>

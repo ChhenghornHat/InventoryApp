@@ -1,8 +1,7 @@
 ﻿using InventoryApp.Models;
 using InventoryApp.Models.Category;
 using InventoryApp.Models.Classes;
-using InventoryApp.Models.FilterData;
-using InventoryApp.Models.PriceList;
+using InventoryApp.Models.Brand;
 using InventoryApp.Models.SubCategory;
 using InventoryApp.Models.WareHouse;
 using Microsoft.AspNetCore.Http;
@@ -10,91 +9,47 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
+using InventoryApp.Models.StoreImage;
 
 namespace InventoryApp.Controllers
 {
     public class InventoryController : Controller
     {
-        public IActionResult SearchFilter()
+        public IActionResult Index()
         {
-            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
+            var role = HttpContext.Session.GetInt32("Role");
+            if (role == 1)
+            {
+                return RedirectToAction("InvLog", "Admin");
+            }
+            else if (role == 0)
             {
                 return View();
             }
             else
             {
-                return RedirectToAction("ViewLogin", "Login");
-            }
-        }
-        public IActionResult DataNotFound()
-        {
-            return View();
-        }
-        public IActionResult ShowInventory(string whsCode, string itmsGrpCod, string itemName, string categoryCode, string subCategoryCode, string stockVal)
-        {
-            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
-            {
-                ClsParameter cp = new ClsParameter();
-                cp.whsCode = whsCode;
-                cp.itmsGrpCod = itmsGrpCod;
-                cp.itemName = itemName;
-                cp.categoryCode = categoryCode;
-                cp.subCategoryCode = subCategoryCode;
-                cp.stockVal = stockVal;
-                return View(cp);
-            }
-            else
-            {
-                return RedirectToAction("ViewLogin", "Login");
+                return RedirectToAction("Index", "Login");
             }
         }
         [HttpGet]
-        public IActionResult getInventory(string whsCode, string itmsGrpCod, string itemName, string categoryCode, string subCategoryCode, string stockVal)
+        public IActionResult GetInventory(string whsCodes, string itmsGrpCods, string itemNames, string categoryCodes, string subCategoryCodes, string stockVal)
         {
+            var priceList = HttpContext.Session.GetString("U_Price");
             DataTable dt = new DataTable();
             ReturnError lsErr = new ReturnError();
             try
             {
-                LoginDb1 login = new LoginDb1(ConnectionString.Database);
+                LoginDb1 login = new LoginDb1(HttpContext.Session.GetString("Database"));
 
                 if (login._errCode == 0)
                 {
-                    login._Cmd = new System.Data.SqlClient.SqlCommand("exec _USP_Inventory_Search " + whsCode + ",'" + ClsPriceList.PriceList + "'," + itmsGrpCod + "," + itemName + "," + categoryCode + "," + subCategoryCode + ","+stockVal+"", login._Con);
-                    login._Ad = new System.Data.SqlClient.SqlDataAdapter(login._Cmd);
-                    login._Cmd.ExecuteNonQuery();
+                    login._Cmd = new SqlCommand("EXEC _USP_Inventory_Search '" + whsCodes + "','" + priceList + "','" + itmsGrpCods + "','" + itemNames + "','" + categoryCodes + "','" + subCategoryCodes + "','"+stockVal+"'", login._Con);
+                    login._Ad = new SqlDataAdapter(login._Cmd);
                     login._Ad.Fill(dt);
-                }
-                else
-                {
-                    lsErr.errCode = login._errCode;
-                    lsErr.errMsg = login._errMsg;
-                }
-            }
-            catch (Exception ex)
-            {
-                lsErr.errCode = ex.HResult;
-                lsErr.errMsg = ex.Message;
-            }
-            string str = DataTableSystemTextJson(dt);
-            return Ok(str);
-        }
-
-        [HttpGet]
-        public IActionResult getInInventory(string whsCodes, string itmsGrpCods, string itemNames, string categoryCodes, string subCategoryCodes, string stockVal)
-        {
-            DataTable dt = new DataTable();
-            ReturnError lsErr = new ReturnError();
-            try
-            {
-                LoginDb1 login = new LoginDb1(ConnectionString.Database);
-
-                if (login._errCode == 0)
-                {
-                    login._Cmd = new System.Data.SqlClient.SqlCommand("EXEC _USP_Inventory_Search '" + whsCodes + "','" + ClsPriceList.PriceList + "','" + itmsGrpCods + "','" + itemNames + "','" + categoryCodes + "','" + subCategoryCodes + "','"+stockVal+"'", login._Con);
-                    login._Ad = new System.Data.SqlClient.SqlDataAdapter(login._Cmd);
-                    login._Cmd.ExecuteNonQuery();
-                    login._Ad.Fill(dt);
+                    login._Con.Close();
                 }
                 else
                 {
@@ -123,8 +78,43 @@ namespace InventoryApp.Controllers
 
             return System.Text.Json.JsonSerializer.Serialize(data);
         }
+
         [HttpGet]
-        public IActionResult getWareHouse()
+        [HttpPost]
+        public IActionResult IvnLog(string brand, string category, string subCategory, string code)
+        {
+            int result = 1;
+            LoginDb2 loginDb2 = new LoginDb2();
+
+            var userCode = HttpContext.Session.GetString("UserCode");
+            var userName = HttpContext.Session.GetString("Username");
+            var cmpName = HttpContext.Session.GetString("CompanyName");
+            var ip = HttpContext.Session.GetString("Ip");
+            if (loginDb2._errCode == 0)
+            {
+                string query = "Search";
+                loginDb2._Cmd = new SqlCommand(query, loginDb2._Con);
+                loginDb2._Cmd.CommandType = CommandType.StoredProcedure;
+                loginDb2._Cmd.Parameters.AddWithValue("@UserCode", userCode);
+                loginDb2._Cmd.Parameters.AddWithValue("@UserName", userName);
+                loginDb2._Cmd.Parameters.AddWithValue("@Company", cmpName);
+                loginDb2._Cmd.Parameters.AddWithValue("@IpAddress", ip);
+                loginDb2._Cmd.Parameters.AddWithValue("@Brand", brand);
+                loginDb2._Cmd.Parameters.AddWithValue("@Category", category);
+                loginDb2._Cmd.Parameters.AddWithValue("@SubCategory", subCategory);
+                loginDb2._Cmd.Parameters.AddWithValue("@ItemCode", code);
+                loginDb2._Cmd.ExecuteNonQuery();
+                loginDb2._Con.Close();
+            }
+            else
+            {
+                result = loginDb2._errCode;
+            }
+
+            return Ok(result);
+        }
+
+        public IActionResult GetWareHouse()
         {
             List<ClsWareHouse> lstWareHouses = new List<ClsWareHouse>();
             ClsWareHouse warehouse;
@@ -133,12 +123,13 @@ namespace InventoryApp.Controllers
             try
             {
                 DataTable dt = new DataTable();
-                LoginDb1 login = new LoginDb1(ConnectionString.Database);
+                LoginDb1 login = new LoginDb1(HttpContext.Session.GetString("Database"));
                 if (login._errCode == 0)
                 {
-                    string query = "SELECT WhsCode, WhsName FROM OWHS";
-                    login._Ad = new System.Data.SqlClient.SqlDataAdapter(query, login._Con);
+                    string query = "EXEC _USP_Warehouse";
+                    login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
+                    login._Con.Close();
 
                     foreach (DataRow row in dt.Rows)
                     {
@@ -163,7 +154,7 @@ namespace InventoryApp.Controllers
             return Ok(lstWareHouses);
         }
         [HttpGet]
-        public IActionResult getBrand()
+        public IActionResult GetBrand()
         {
             List<ClsBrand> lsBrands = new List<ClsBrand>();
             ClsBrand brand;
@@ -172,13 +163,14 @@ namespace InventoryApp.Controllers
             try
             {
                 DataTable dt = new DataTable();
-                LoginDb1 login = new LoginDb1(ConnectionString.Database);
+                LoginDb1 login = new LoginDb1(HttpContext.Session.GetString("Database"));
 
                 if (login._errCode == 0)
                 {
                     string query = "SELECT ItmsGrpCod, ItmsGrpNam FROM OITB";
-                    login._Ad = new System.Data.SqlClient.SqlDataAdapter(query, login._Con);
+                    login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
+                    login._Con.Close();
 
                     foreach (DataRow row in dt.Rows)
                     {
@@ -203,7 +195,7 @@ namespace InventoryApp.Controllers
             return Ok(lsBrands);
         }
         [HttpGet]
-        public IActionResult getCategory()
+        public IActionResult GetCategory()
         {
             List<ClsCategory> lsCategory = new List<ClsCategory>();
             ClsCategory category;
@@ -216,9 +208,10 @@ namespace InventoryApp.Controllers
 
                 if (login._errCode == 0)
                 {
-                    string query = "SELECT Code, Name FROM [@category]";
-                    login._Ad = new System.Data.SqlClient.SqlDataAdapter(query, login._Con);
+                    string query = ConnectionString.QueryCategory;
+                    login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
+                    login._Con.Close();
 
                     foreach (DataRow row in dt.Rows)
                     {
@@ -243,7 +236,7 @@ namespace InventoryApp.Controllers
             return Ok(lsCategory);
         }
         [HttpGet]
-        public IActionResult getCategoryFilter(string code)
+        public IActionResult GetCategoryFilter(string code)
         {
             List<ClsSubCategory> lsSubCategory = new List<ClsSubCategory>();
             ClsSubCategory subcategory;
@@ -252,13 +245,14 @@ namespace InventoryApp.Controllers
             try
             {
                 DataTable dt = new DataTable();
-                LoginDb1 login = new LoginDb1(ConnectionString.Database);
+                LoginDb1 login = new LoginDb1(HttpContext.Session.GetString("Database"));
 
                 if (login._errCode == 0)
                 {
-                    string query = ""+ConnectionString.QueryCategory+"="+code+"";
-                    login._Ad = new System.Data.SqlClient.SqlDataAdapter(query, login._Con);
+                    string query = ""+ConnectionString.QuerySubCategory+" IN('"+code+"')";
+                    login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
+                    login._Con.Close();
 
                     foreach (DataRow row in dt.Rows)
                     {
@@ -281,6 +275,29 @@ namespace InventoryApp.Controllers
                 lsErr.errMsg = ex.Message;
             }
             return Ok(lsSubCategory);
+        }
+        public IActionResult CallImage(string folderName)
+        {
+            List<StoreImage> storeImages = new List<StoreImage>();
+            var Path = ConnectionString.ImageUrl + folderName +"\\";
+            //var Path = ConnectionString.ImageUrl;
+            
+            DirectoryInfo place = new DirectoryInfo(Path);
+            FileInfo[] Files = place.GetFiles();
+
+            foreach(FileInfo i in Files)
+            {
+                StoreImage image = new StoreImage();
+                byte[] bytes = System.IO.File.ReadAllBytes(Path + i.Name);
+                image.ImageUrl = Path + i.Name;
+
+                string base64String = Convert.ToBase64String(bytes, 0, bytes.Length);
+                image.ImageName = "data:image/png;base64," + base64String;
+                
+                storeImages.Add(image);
+            }
+
+            return Ok(storeImages);
         }
     }
 }
