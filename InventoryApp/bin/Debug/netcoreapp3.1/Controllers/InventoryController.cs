@@ -79,7 +79,6 @@ namespace InventoryApp.Controllers
             return System.Text.Json.JsonSerializer.Serialize(data);
         }
 
-        [HttpGet]
         [HttpPost]
         public IActionResult IvnLog(string brand, string category, string subCategory, string code)
         {
@@ -204,7 +203,7 @@ namespace InventoryApp.Controllers
             try
             {
                 DataTable dt = new DataTable();
-                LoginDb1 login = new LoginDb1(ConnectionString.Database);
+                LoginDb1 login = new LoginDb1(HttpContext.Session.GetString("Database"));
 
                 if (login._errCode == 0)
                 {

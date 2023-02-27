@@ -96,7 +96,7 @@
 
                     <div class="col-lg-2">
                         <label style="visibility: hidden">Search</label>
-                        <button type="submit" class="btn btn-primary btn-flat" id="searchBtn" style="width:100%"><small class="fa fa-search"></small> Search</button>
+                        <button type="submit" class="btn btn-primary btn-flat" id="searchBtn" style="width:100%" disabled="disabled"><small class="fa fa-search"></small> Search</button>
                     </div>
                 </div>
             </div>
@@ -493,11 +493,15 @@
     $(document).ready(function() {
         $('.select2').select2();
 
-        $(':input[type="submit"]').prop('disabled', true);
+        let codeOrName = $('input[type="text"]').val();
 
+        if (codeOrName === '') {
+            $(':input[type="submit"]').prop('disabled', true);
+        }
+        
         $('#brand').change(function () {
-            let category = $('#category').val();
-            if ($(this).val() === '0' && category === '0') {
+            let category = $('#category').val(); 
+            if ($(this).val() === '0' && category === '0' && codeOrName === "") {
                 $('button[type="submit"]').prop('disabled', true);
             } else {
                 $('button[type="submit"]').prop('disabled', false);
@@ -506,7 +510,7 @@
 
         $('#category').change(function () {
             let brand = $('#brand').val();
-            if ($(this).val() === '0' && brand === '0') {
+            if ($(this).val() === '0' && brand === '0' && codeOrName === "") {
                 $('button[type="submit"]').prop('disabled', true);
             } else {
                 $('button[type="submit"]').prop('disabled', false);
