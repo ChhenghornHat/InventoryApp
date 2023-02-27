@@ -285,7 +285,7 @@
                                 "lengthChange": false,
                                 "autoWidth": true,
                                 "searching": false,
-                                "paging": true,
+                                "paging": false,
                                 "scrollY": '50vh',
                                 "scrollX": false,
                                 "scrollCollapse": true,
@@ -303,8 +303,6 @@
                             });
 
                             table.rows.add(listInventory).draw();
-                            
-                            console.log(itemName);
 
                             table.on('click', 'tr', function () {
                                 //var data = table.row(this).data();
@@ -354,11 +352,11 @@
 
                     responsive(maxWidth);
                     maxWidth.addListener(responsive);
-
-                    resetTimer();
-
                 }
 
+            },
+            complete: function() {
+                resetTimer();
             }
 
         });

@@ -22,11 +22,8 @@ namespace InventoryApp
         {
             services.AddControllersWithViews();
             services.AddDistributedMemoryCache();
-            services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromDays(1);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
+            services.AddSession(options => {
+                options.IdleTimeout = TimeSpan.FromHours(24);
             });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddRouting(options => options.LowercaseUrls = true);

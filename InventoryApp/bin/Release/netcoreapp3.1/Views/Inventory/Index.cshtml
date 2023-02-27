@@ -285,7 +285,7 @@
                                 "lengthChange": false,
                                 "autoWidth": true,
                                 "searching": false,
-                                "paging": true,
+                                "paging": false,
                                 "scrollY": '50vh',
                                 "scrollX": false,
                                 "scrollCollapse": true,
@@ -303,8 +303,6 @@
                             });
 
                             table.rows.add(listInventory).draw();
-                            
-                            console.log(itemName);
 
                             table.on('click', 'tr', function () {
                                 //var data = table.row(this).data();
@@ -354,11 +352,11 @@
 
                     responsive(maxWidth);
                     maxWidth.addListener(responsive);
-
-                    resetTimer();
-
                 }
 
+            },
+            complete: function() {
+                resetTimer();
             }
 
         });
@@ -493,15 +491,15 @@
     $(document).ready(function() {
         $('.select2').select2();
 
-        let codeOrName = $('#codeorname').val();
+        let codeOrName = $('input[type="text"]').val();
 
         if (codeOrName === '') {
             $(':input[type="submit"]').prop('disabled', true);
         }
         
         $('#brand').change(function () {
-            let category = $('#category').val();
-            if ($(this).val() === '0' && category === '0' && codeOrName === '') {
+            let category = $('#category').val(); 
+            if ($(this).val() === '0' && category === '0' && codeOrName === "") {
                 $('button[type="submit"]').prop('disabled', true);
             } else {
                 $('button[type="submit"]').prop('disabled', false);
@@ -510,7 +508,7 @@
 
         $('#category').change(function () {
             let brand = $('#brand').val();
-            if ($(this).val() === '0' && brand === '0' && codeOrName === '') {
+            if ($(this).val() === '0' && brand === '0' && codeOrName === "") {
                 $('button[type="submit"]').prop('disabled', true);
             } else {
                 $('button[type="submit"]').prop('disabled', false);
