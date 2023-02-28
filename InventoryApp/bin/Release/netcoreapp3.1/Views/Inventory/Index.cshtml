@@ -523,10 +523,11 @@
                 dataType: 'JSON',
                 data: { code: id },
                 success: function (data) {
+                    //console.log(data)
                     $('#subcategory').empty();
                     $('#subcategory').append('<option value="0" selected="selected">Choose sub category</option>');
-                    for (i = 0; i < data.length; i++) {
-                        $('#subcategory').append('<option value="' + data[i].subCategoryCode + '">' + data[i].subCategoryName + '</option>');
+                    for (let i = 0; i < data.length; i++) {
+                        $('#subcategory').append('<option value="' + data[i].subCategoryName + '">' + data[i].subCategoryName + '</option>');
                     }
                 }
             })
@@ -584,7 +585,7 @@
                 //console.log(data);
                 for (var i = 0; i < data.length; i++) {
                     //console.log(data[i].code);
-                    $('#category').append('<option value="' + data[i].categoryCode + '">' + data[i].categoryName + '</option>');
+                    $('#category').append('<option value="' + data[i].categoryName + '">' + data[i].categoryName + '</option>');
                 }
             }
         });

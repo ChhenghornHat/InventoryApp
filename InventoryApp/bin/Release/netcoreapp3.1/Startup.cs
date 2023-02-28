@@ -21,8 +21,8 @@ namespace InventoryApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddDistributedMemoryCache();
-            services.AddSession(options => {
+            services.AddSession(options =>
+            {
                 options.IdleTimeout = TimeSpan.FromHours(24);
             });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -46,10 +46,8 @@ namespace InventoryApp
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
-
-            app.UseCookiePolicy();
-            app.UseSession();
             app.UseRouting();
+            app.UseSession();
 
             app.UseAuthorization();
 

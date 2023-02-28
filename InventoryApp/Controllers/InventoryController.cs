@@ -34,8 +34,9 @@ namespace InventoryApp.Controllers
                 return RedirectToAction("Index", "Login");
             }
         }
+        
         [HttpGet]
-        public IActionResult GetInventory(string whsCodes, string itmsGrpCods, string itemNames, string categoryCodes, string subCategoryCodes, string stockVal)
+        public IActionResult GetInventory(string whsCode, string itmsGrpCod, string itemName, string categoryCode, string subCategoryCode, string stockVal)
         {
             var priceList = HttpContext.Session.GetString("U_Price");
             DataTable dt = new DataTable();
@@ -46,7 +47,7 @@ namespace InventoryApp.Controllers
 
                 if (login._errCode == 0)
                 {
-                    login._Cmd = new SqlCommand("EXEC _USP_Inventory_Search '" + whsCodes + "','" + priceList + "','" + itmsGrpCods + "','" + itemNames + "','" + categoryCodes + "','" + subCategoryCodes + "','"+stockVal+"'", login._Con);
+                    login._Cmd = new SqlCommand("EXEC _USP_Inventory_Search '"+whsCode+"','"+priceList+"','"+itmsGrpCod+"','"+itemName+"','"+categoryCode+"','"+subCategoryCode+"','"+stockVal+"'", login._Con);
                     login._Ad = new SqlDataAdapter(login._Cmd);
                     login._Ad.Fill(dt);
                     login._Con.Close();
@@ -275,6 +276,8 @@ namespace InventoryApp.Controllers
             }
             return Ok(lsSubCategory);
         }
+        
+        [HttpGet]
         public IActionResult CallImage(string folderName)
         {
             List<StoreImage> storeImages = new List<StoreImage>();

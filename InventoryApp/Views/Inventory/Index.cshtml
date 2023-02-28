@@ -235,7 +235,7 @@
             url: '@Url.Action("GetInventory", "Inventory")',
             type: 'GET',
             dataType: 'JSON',
-            data: { whsCodes: warehouses, itmsGrpCods: brand, itemNames: codeorname, categoryCodes: category, subCategoryCodes: subcategory, stockVal: stock_value },
+            data: { whsCode: warehouses, itmsGrpCod: brand, itemName: codeorname, categoryCode: category, subCategoryCode: subcategory, stockVal: stock_value },
             beforeSend: function () {
                 setTimer();
             },
@@ -315,7 +315,7 @@
                                 $('#tblInventory').DataTable().clear().destroy();
                                 $('#tblInventory').html('');
                             }
-                            var table = $('#tblInventory').DataTable({
+                            let table = $('#tblInventory').DataTable({
                                 "columns": cols,
                                 "responsive": false,
                                 "lengthChange": false,
@@ -348,7 +348,7 @@
                         }
                     }
 
-                    var maxWidth = window.matchMedia("(max-width: 768px)");
+                    let maxWidth = window.matchMedia("(max-width: 768px)");
 
                     responsive(maxWidth);
                     maxWidth.addListener(responsive);
@@ -523,9 +523,10 @@
                 dataType: 'JSON',
                 data: { code: id },
                 success: function (data) {
+                    //console.log(data)
                     $('#subcategory').empty();
                     $('#subcategory').append('<option value="0" selected="selected">Choose sub category</option>');
-                    for (i = 0; i < data.length; i++) {
+                    for (let i = 0; i < data.length; i++) {
                         $('#subcategory').append('<option value="' + data[i].subCategoryCode + '">' + data[i].subCategoryName + '</option>');
                     }
                 }
@@ -533,7 +534,7 @@
         });
 
         $('input[type="text"]').keyup(function () {
-            var value = $(this).val();
+            let value = $(this).val();
             let brand = $('#brand').val();
             let category = $('#category').val();
             if (value.length >= 3 && value != '') {
