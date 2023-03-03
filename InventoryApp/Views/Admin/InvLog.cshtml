@@ -156,8 +156,20 @@
     $('#dateFrom').datepicker("setDate", new Date());
     $('#fromTo').datepicker("setDate", new Date());
     
+    $(document).keypress(function(event){
+        let keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13'){
+           //alert('You pressed a ENTER key.');
+           event.preventDefault();
+           getInvLog();
+        }
+    });
+    
     $('#searchBtn').click(function() {
-      
+        getInvLog();
+    });
+    
+    function getInvLog() {
         $.ajax({
             url: '@Url.Action("GetHistoryLog", "Admin")',
             type: 'GET',
@@ -230,7 +242,7 @@
                 
             }
         });
-    });
+    }
     
     $.ajax({
         url: '@Url.Action("GetCompanyName", "Login")',

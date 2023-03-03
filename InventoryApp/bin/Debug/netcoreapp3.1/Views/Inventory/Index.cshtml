@@ -1,4 +1,5 @@
-﻿
+﻿@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor;
 @{
     ViewData["Title"] = "Result of Inventory" + " " + DateTime.Now;
 }
@@ -91,12 +92,18 @@
                         <div class="form-group">
                             <label for="codeorname">Item Code or Name</label>
                             <input type="text" class="form-control" id="codeorname" placeholder="Enter item code or name">
+                            <input type="hidden" id="database" value="@HttpContextAccessor.HttpContext.Session.GetString("Database")">
+                            <input type="hidden" id="usercode" value="@HttpContextAccessor.HttpContext.Session.GetString("UserCode")">
+                            <input type="hidden" id="username" value="@HttpContextAccessor.HttpContext.Session.GetString("Username")">
+                            <input type="hidden" id="ip" value="@HttpContextAccessor.HttpContext.Session.GetString("Ip")">
+                            <input type="hidden" id="cmpName" value="@HttpContextAccessor.HttpContext.Session.GetString("CompanyName")">
+                            <input type="hidden" id="priceList" value="@HttpContextAccessor.HttpContext.Session.GetString("U_Price")">
                         </div>
                     </div>
 
                     <div class="col-lg-2">
                         <label style="visibility: hidden">Search</label>
-                        <button type="submit" class="btn btn-primary btn-flat" id="searchBtn" style="width:100%" disabled="disabled"><small class="fa fa-search"></small> Search</button>
+                        <button type="submit" class="btn btn-primary btn-flat" id="searchBtn" style="width:100%" disabled="disabled">Search <small class="fa fa-search"></small></button>
                     </div>
                 </div>
             </div>
@@ -210,6 +217,24 @@
         loadInventory();
         InvLog();
     });
+    
+    $(document).keypress(function(event){
+        let keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13'){
+           //alert('You pressed a ENTER key.');
+           event.preventDefault();
+           if ($('#brand').val() == '0' && $('#category').val() == '0' && $('#subcategory').val() == '0' && $('#codeorname').val() == '') {
+               alert("Please choose one item to continue");
+           } else {
+               $('.collapseses').addClass('collapsed-box');
+              $('.pluses').removeClass('fa-minus');
+              $('.pluses').addClass('fa-plus');
+              loadInventory();
+              InvLog();
+           }
+          
+        }
+    });
 
     let stock_value = 0;
     $("input[type='radio'].radioBtnClass").change(function () {
@@ -225,6 +250,8 @@
         let category = $('#category').val();
         let subcategory = $('#subcategory').val();
         let codeorname = $('#codeorname').val();
+        let database = $('#database').val();
+        let priceList = $('#priceList').val();
 
         let warehouses = warehouse.toString();
         if (codeorname === "") {
@@ -235,7 +262,7 @@
             url: '@Url.Action("GetInventory", "Inventory")',
             type: 'GET',
             dataType: 'JSON',
-            data: { whsCode: warehouses, itmsGrpCod: brand, itemName: codeorname, categoryCode: category, subCategoryCode: subcategory, stockVal: stock_value },
+            data: { whsCode: warehouses, itmsGrpCod: brand, itemName: codeorname, categoryCode: category, subCategoryCode: subcategory, stockVal: stock_value, database: database, priceList: priceList },
             beforeSend: function () {
                 setTimer();
             },
@@ -315,7 +342,7 @@
                                 $('#tblInventory').DataTable().clear().destroy();
                                 $('#tblInventory').html('');
                             }
-                            var table = $('#tblInventory').DataTable({
+                            let table = $('#tblInventory').DataTable({
                                 "columns": cols,
                                 "responsive": false,
                                 "lengthChange": false,
@@ -348,7 +375,7 @@
                         }
                     }
 
-                    var maxWidth = window.matchMedia("(max-width: 768px)");
+                    let maxWidth = window.matchMedia("(max-width: 768px)");
 
                     responsive(maxWidth);
                     maxWidth.addListener(responsive);
@@ -466,7 +493,15 @@
             url: '@Url.Action("IvnLog", "Inventory")',
             type: 'POST',
             dataType: 'JSON',
-            data: {brand: $('#brand option:selected').text(), category: $('#category option:selected').text(), subCategory: $('#subcategory option:selected').text(), code: $('#codeorname').val()},
+            data: {brand: $('#brand option:selected').text(), 
+                    category: $('#category option:selected').text(), 
+                    subCategory: $('#subcategory option:selected').text(),
+                    code: $('#codeorname').val(),
+                    usercode: $('#usercode').val(),
+                    username: $('#username').val(),
+                    ip: $('#ip').val(),
+                    cmpName: $('#cmpName').val(),
+            },
             beforeSend: function() {
                 console.log("Loading...");
             },
@@ -516,12 +551,13 @@
         });
 
         $('#category').change(function () {
-            var id = $('#category').val();
+            let id = $('#category').val();
+            let database = $('#database').val();
             $.ajax({
                 url: '@Url.Action("GetCategoryFilter", "Inventory")',
                 type: 'GET',
                 dataType: 'JSON',
-                data: { code: id },
+                data: { code: id, database: database },
                 success: function (data) {
                     //console.log(data)
                     $('#subcategory').empty();
@@ -556,7 +592,7 @@
             dataType: 'JSON',
             success: function (data) {
                 //console.log(data)
-                for (i = 0; i < data.length; i++) {
+                for (let i = 0; i < data.length; i++) {
                     //console.log(data[i].whsCode);
                     $('#whsCodes').append('<option value="' + data[i].whsCode + '" selected>' + data[i].whsName + '</option>');
                 }
@@ -569,7 +605,7 @@
             type: 'GET',
             dataType: 'JSON',
             success: function (data) {
-                for (var i = 0; i < data.length; i++) {
+                for (let i = 0; i < data.length; i++) {
                     //console.log(data[i].itmsGrpCod);
                     $('#brand').append('<option value="' + data[i].itmsGrpCod + '">' + data[i].itmsGrpNam + '</option>');
                 }
@@ -583,7 +619,7 @@
             dataType: 'JSON',
             success: function (data) {
                 //console.log(data);
-                for (var i = 0; i < data.length; i++) {
+                for (let i = 0; i < data.length; i++) {
                     //console.log(data[i].code);
                     $('#category').append('<option value="' + data[i].categoryCode + '">' + data[i].categoryName + '</option>');
                 }

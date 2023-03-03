@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlClient;
 using System;
+using System.Data;
 
 namespace InventoryApp.Models.Classes
 {
@@ -33,9 +34,9 @@ namespace InventoryApp.Models.Classes
                 string ConnString = "Server = " + Server + ";Initial Catalog = " + Database + "; User id = "+UserId+";Password = " + Password + "";
 
                 _Con = new SqlConnection(ConnString);
-                if (_Con.State == System.Data.ConnectionState.Closed) { _Con.Open(); }
+                if (_Con.State == ConnectionState.Closed) { _Con.Open(); }
 
-                if (_Con.State == System.Data.ConnectionState.Open) { errCode = 0; }
+                if (_Con.State == ConnectionState.Open) { errCode = 0; }
                 else { errCode = 9999; }
             }
             catch (Exception ex)

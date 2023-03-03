@@ -34,19 +34,21 @@ namespace InventoryApp.Controllers
                 return RedirectToAction("Index", "Login");
             }
         }
+        
         [HttpGet]
-        public IActionResult GetInventory(string whsCodes, string itmsGrpCods, string itemNames, string categoryCodes, string subCategoryCodes, string stockVal)
+        public IActionResult GetInventory(string whsCode, string itmsGrpCod, string itemName, string categoryCode, string subCategoryCode, string stockVal, string database, string priceList)
         {
-            var priceList = HttpContext.Session.GetString("U_Price");
             DataTable dt = new DataTable();
             ReturnError lsErr = new ReturnError();
             try
             {
-                LoginDb1 login = new LoginDb1(HttpContext.Session.GetString("Database"));
+                //var priceList = HttpContext.Session.GetString("U_Price");
+                //var database = HttpContext.Session.GetString("Database");
+                LoginDb1 login = new LoginDb1(database);
 
                 if (login._errCode == 0)
                 {
-                    login._Cmd = new SqlCommand("EXEC _USP_Inventory_Search '" + whsCodes + "','" + priceList + "','" + itmsGrpCods + "','" + itemNames + "','" + categoryCodes + "','" + subCategoryCodes + "','"+stockVal+"'", login._Con);
+                    login._Cmd = new SqlCommand("EXEC _USP_Inventory_Search '"+whsCode+"','"+priceList+"','"+itmsGrpCod+"','"+itemName+"','"+categoryCode+"','"+subCategoryCode+"','"+stockVal+"'", login._Con);
                     login._Ad = new SqlDataAdapter(login._Cmd);
                     login._Ad.Fill(dt);
                     login._Con.Close();
@@ -80,15 +82,15 @@ namespace InventoryApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult IvnLog(string brand, string category, string subCategory, string code)
+        public IActionResult IvnLog(string brand, string category, string subCategory, string code, string userCode, string userName, string cmpName, string ip)
         {
             int result = 1;
             LoginDb2 loginDb2 = new LoginDb2();
 
-            var userCode = HttpContext.Session.GetString("UserCode");
-            var userName = HttpContext.Session.GetString("Username");
-            var cmpName = HttpContext.Session.GetString("CompanyName");
-            var ip = HttpContext.Session.GetString("Ip");
+            //var userCode = HttpContext.Session.GetString("UserCode");
+            // var userName = HttpContext.Session.GetString("Username");
+            // var cmpName = HttpContext.Session.GetString("CompanyName");
+            //var ip = HttpContext.Session.GetString("Ip");
             if (loginDb2._errCode == 0)
             {
                 string query = "Search";
@@ -122,7 +124,8 @@ namespace InventoryApp.Controllers
             try
             {
                 DataTable dt = new DataTable();
-                LoginDb1 login = new LoginDb1(HttpContext.Session.GetString("Database"));
+                var database = HttpContext.Session.GetString("Database");
+                LoginDb1 login = new LoginDb1(database);
                 if (login._errCode == 0)
                 {
                     string query = "EXEC _USP_Warehouse";
@@ -162,7 +165,8 @@ namespace InventoryApp.Controllers
             try
             {
                 DataTable dt = new DataTable();
-                LoginDb1 login = new LoginDb1(HttpContext.Session.GetString("Database"));
+                var database = HttpContext.Session.GetString("Database");
+                LoginDb1 login = new LoginDb1(database);
 
                 if (login._errCode == 0)
                 {
@@ -203,7 +207,8 @@ namespace InventoryApp.Controllers
             try
             {
                 DataTable dt = new DataTable();
-                LoginDb1 login = new LoginDb1(HttpContext.Session.GetString("Database"));
+                var database = HttpContext.Session.GetString("Database");
+                LoginDb1 login = new LoginDb1(database);
 
                 if (login._errCode == 0)
                 {
@@ -235,7 +240,7 @@ namespace InventoryApp.Controllers
             return Ok(lsCategory);
         }
         [HttpGet]
-        public IActionResult GetCategoryFilter(string code)
+        public IActionResult GetCategoryFilter(string code, string database)
         {
             List<ClsSubCategory> lsSubCategory = new List<ClsSubCategory>();
             ClsSubCategory subcategory;
@@ -244,7 +249,8 @@ namespace InventoryApp.Controllers
             try
             {
                 DataTable dt = new DataTable();
-                LoginDb1 login = new LoginDb1(HttpContext.Session.GetString("Database"));
+                //var database = HttpContext.Session.GetString("Database");
+                LoginDb1 login = new LoginDb1(database);
 
                 if (login._errCode == 0)
                 {
@@ -275,6 +281,8 @@ namespace InventoryApp.Controllers
             }
             return Ok(lsSubCategory);
         }
+        
+        [HttpGet]
         public IActionResult CallImage(string folderName)
         {
             List<StoreImage> storeImages = new List<StoreImage>();

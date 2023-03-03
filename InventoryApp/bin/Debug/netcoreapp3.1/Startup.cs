@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace InventoryApp
 {
@@ -20,11 +21,8 @@ namespace InventoryApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSession();
             services.AddControllersWithViews();
-            services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromHours(24);
-            });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddRazorPages().AddRazorRuntimeCompilation();
@@ -58,6 +56,7 @@ namespace InventoryApp
                     pattern: "{controller=Login}/{action=Index}/{id?}");
                     // pattern: "{controller=Admin}/{action=AdminDashboard}/{id?}");
             });
+            Models.Classes.ConnectionString.Constr = Configuration.GetSection("ConnectionString").Value.ToString();
             Models.Classes.ConnectionString.Constr = Configuration.GetSection("ConnectionString").Value.ToString();
             Models.Classes.ConnectionString.Constr2 = Configuration.GetSection("ConnectionString2").Value.ToString();
             Models.Classes.ConnectionString.Server = Configuration.GetSection("ServerName").Value.ToString();

@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -49,7 +51,8 @@
         <nav class="navbar navbar-static-top">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <a href="#" class="navbar-brand"><b>Inventory</b> App</a>
+                    @* <a href="#" class="navbar-brand"><b>Inventory</b> App</a> *@
+                    <a href="#" class="navbar-brand"><b>@HttpContextAccessor.HttpContext.Session.GetString("CompanyName")</b> (@HttpContextAccessor.HttpContext.Session.GetString("Username"))</a>
                     <button type="button" class="navbar-toggle collapsed">
                         <a asp-action="Logout" asp-controller="Login" style="color: white;">Logout <i class="fa fa-sign-out"></i></a>
                     </button>

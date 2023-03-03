@@ -1,14 +1,12 @@
 ﻿using InventoryApp.Models;
 using InventoryApp.Models.Classes;
 using InventoryApp.Models.CompanyName;
-using InventoryApp.Models.PriceList;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using InventoryApp.Models.Username;
 
 namespace InventoryApp.Controllers
 {
@@ -35,10 +33,11 @@ namespace InventoryApp.Controllers
         public IActionResult PostLogin(string usercode, string password, string database, string ip, string cmpName)
         {
             int result = 1;
-            HttpContext.Session.SetString("Database",database);
+            
             //ConnectionString.Database = database;
             DataTable dt = new DataTable();
             LoginDb1 login = new LoginDb1(database);
+            HttpContext.Session.SetString("Database",database);
             if (login._errCode == 0)
             {
                 try
@@ -48,6 +47,7 @@ namespace InventoryApp.Controllers
                     login._Ad.Fill(dt);
                     login._Con.Close();
 
+                    
                     foreach (DataRow row in dt.Rows)
                     {
                         HttpContext.Session.SetString("U_Price", row["U_Price"].ToString());
@@ -90,7 +90,7 @@ namespace InventoryApp.Controllers
             } 
             else
             {
-                HttpContext.Session.SetString("UserId", "");
+                //HttpContext.Session.SetString("Role", "");
                 result = login._errCode;
             }
             return Ok(result);
