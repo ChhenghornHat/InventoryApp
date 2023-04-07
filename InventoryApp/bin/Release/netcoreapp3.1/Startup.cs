@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace InventoryApp
 {
@@ -64,6 +62,7 @@ namespace InventoryApp
             Models.Classes.ConnectionString.Password = Configuration.GetSection("Password").Value.ToString();
 
             Models.Classes.ConnectionString.QueryDatabase = Configuration.GetSection("QueryDatabase").Value.ToString();
+            Models.Classes.ConnectionString.QueryBrand = Configuration.GetSection("QueryBrand").Value.ToString();
             Models.Classes.ConnectionString.QueryCategory = Configuration.GetSection("QueryCategory").Value.ToString();
             Models.Classes.ConnectionString.QuerySubCategory = Configuration.GetSection("QuerySubCategory").Value.ToString();
             Models.Classes.ConnectionString.ImageUrl = Configuration.GetSection("ImageUrl").Value.ToString();

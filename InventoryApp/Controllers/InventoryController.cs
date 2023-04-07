@@ -170,7 +170,7 @@ namespace InventoryApp.Controllers
 
                 if (login._errCode == 0)
                 {
-                    string query = "SELECT ItmsGrpCod, ItmsGrpNam FROM OITB";
+                    string query = ConnectionString.QueryBrand;
                     login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
                     login._Con.Close();

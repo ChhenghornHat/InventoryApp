@@ -4,16 +4,6 @@
     ViewData["Title"] = "Result of Inventory" + " " + DateTime.Now;
 }
 
-@* <style> *@
-@*     td { *@
-@*         white-space: nowrap; *@
-@*     } *@
-@*       *@
-@*     td.wrapok { *@
-@*         white-space:normal *@
-@*     } *@
-@* </style> *@
-
 <div class="loading">
     <div class="lds-roller">
         <div></div>
@@ -267,8 +257,7 @@
                 setTimer();
             },
             success: function (data) {
-                            //console.log(data);
-                            
+                // check whether data have or not
                 if (data == "") {
                     if ($.fn.DataTable.isDataTable("#tblInventory")) {
                         $('#tblInventory').DataTable().clear().destroy();
@@ -313,12 +302,11 @@
                                 "autoWidth": true,
                                 "searching": false,
                                 "paging": false,
-                                "scrollY": '50vh',
+                                "scrollY": '60vh',
                                 "scrollX": false,
                                 "scrollCollapse": true,
                                 "columnDefs": [
                                     { visible: false, targets: 1 },
-                                    //{targets:["ItemName"], class:"wrapok"}
                                 ],
                                 buttons: [
                                     { extend: 'excel', className: 'btn bg-olive btn-flat' },
@@ -345,11 +333,11 @@
                             let table = $('#tblInventory').DataTable({
                                 "columns": cols,
                                 "responsive": false,
-                                "lengthChange": false,
+                                "lengthChange": true,
                                 "autoWidth": true,
                                 "searching": true,
                                 "paging": false,
-                                "scrollY": '50vh',
+                                "scrollY": '60vh',
                                 "scrollX": true,
                                 "scrollCollapse": true,
                                 "columnDefs": [
@@ -494,13 +482,13 @@
             type: 'POST',
             dataType: 'JSON',
             data: {brand: $('#brand option:selected').text(), 
-                    category: $('#category option:selected').text(), 
-                    subCategory: $('#subcategory option:selected').text(),
-                    code: $('#codeorname').val(),
-                    usercode: $('#usercode').val(),
-                    username: $('#username').val(),
-                    ip: $('#ip').val(),
-                    cmpName: $('#cmpName').val(),
+                category: $('#category option:selected').text(), 
+                subCategory: $('#subcategory option:selected').text(),
+                code: $('#codeorname').val(),
+                usercode: $('#usercode').val(),
+                username: $('#username').val(),
+                ip: $('#ip').val(),
+                cmpName: $('#cmpName').val(),
             },
             beforeSend: function() {
                 console.log("Loading...");
@@ -527,9 +515,9 @@
         $('.select2').select2();
 
         let codeOrName = $('input[type="text"]').val();
-
+        
         if (codeOrName === '') {
-            $(':input[type="submit"]').prop('disabled', true);
+            $('button[type="submit"]').prop('disabled', true);
         }
         
         $('#brand').change(function () {
@@ -592,10 +580,20 @@
             dataType: 'JSON',
             success: function (data) {
                 //console.log(data)
-                for (let i = 0; i < data.length; i++) {
-                    //console.log(data[i].whsCode);
-                    $('#whsCodes').append('<option value="' + data[i].whsCode + '" selected>' + data[i].whsName + '</option>');
-                }
+                
+                let whsCode = ['1','2','3'];
+                
+                data.forEach((items) => {
+                    whsCode.forEach((item) => {
+                        $('#whsCodes').append(`<option value="${items.whsCode}" ${items.whsCode == item ? 'selected' : ''}>${items.whsName}</option>`);
+                    });
+                    
+                });
+                // for (let i = 0; i < data.length; i++) {
+                //     //console.log(data[i].whsCode);
+                //     // $('#whsCodes').append('<option value="' + data[i].whsCode + '" selected>' + data[i].whsName + '</option>');
+                //     $('#whsCodes').append(`<option value="${data[i].whsCode}" ${data[i].whsCode == 1 ? 'selected' : ''}>${data[i].whsName}</option>`);
+                // }
             }
         });
 
@@ -618,7 +616,6 @@
             type: 'GET',
             dataType: 'JSON',
             success: function (data) {
-                //console.log(data);
                 for (let i = 0; i < data.length; i++) {
                     //console.log(data[i].code);
                     $('#category').append('<option value="' + data[i].categoryCode + '">' + data[i].categoryName + '</option>');
