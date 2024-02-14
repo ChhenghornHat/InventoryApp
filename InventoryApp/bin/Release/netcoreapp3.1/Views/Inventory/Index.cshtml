@@ -4,16 +4,6 @@
     ViewData["Title"] = "Result of Inventory" + " " + DateTime.Now;
 }
 
-@* <style> *@
-@*     td { *@
-@*         white-space: nowrap; *@
-@*     } *@
-@*       *@
-@*     td.wrapok { *@
-@*         white-space:normal *@
-@*     } *@
-@* </style> *@
-
 <div class="loading">
     <div class="lds-roller">
         <div></div>
@@ -45,7 +35,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="form-group">
-                            <label>WareHouse</label>
+                            <label>Ware House</label>
                             <select class="form-control select2" id="whsCodes" multiple="multiple" data-placeholder="Select a State" style="width: 100%;" required>
                             </select>
                         </div>
@@ -91,7 +81,10 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="codeorname">Item Code or Name</label>
-                            <input type="text" class="form-control" id="codeorname" placeholder="Enter item code or name">
+                            <datalist id="item">
+
+                            </datalist>
+                            <input type="text" list="item" class="form-control" id="codeorname" placeholder="Enter item code or name">
                             <input type="hidden" id="database" value="@HttpContextAccessor.HttpContext.Session.GetString("Database")">
                             <input type="hidden" id="usercode" value="@HttpContextAccessor.HttpContext.Session.GetString("UserCode")">
                             <input type="hidden" id="username" value="@HttpContextAccessor.HttpContext.Session.GetString("Username")">
@@ -100,7 +93,6 @@
                             <input type="hidden" id="priceList" value="@HttpContextAccessor.HttpContext.Session.GetString("U_Price")">
                         </div>
                     </div>
-
                     <div class="col-lg-2">
                         <label style="visibility: hidden">Search</label>
                         <button type="submit" class="btn btn-primary btn-flat" id="searchBtn" style="width:100%" disabled="disabled">Search <small class="fa fa-search"></small></button>
@@ -133,18 +125,40 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title">Image and Space</h4>
+                <h4 class="modal-title">View Space</h4>
             </div>
             <div class="modal-body">
+                <textarea class="form-control" id="space" rows="15" readonly></textarea>
+                <h4 class="space-msg"></h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger close-modal" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- view photo modal -->
+<div class="modal fade" id="viewPhotoModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">View Photo</h4>
+            </div>
+            <div class="modal-body">
+                @* <div class="row" id="listViewPhotoData"></div> *@
                 <!-- Swiper -->
                 <div class="swiper mySwiper">
-                    <div class="swiper-wrapper">
+                    <div class="swiper-wrapper" id="listViewPhotoData">
                     </div>
                     <div class="swiper-pagination"></div>
                 </div>
-                <br>
-                <textarea class="form-control" id="space" rows="15" readonly></textarea>
-                <h4 class="space-msg"></h4>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger close-modal" data-dismiss="modal">Close</button>
@@ -166,10 +180,10 @@
         grabCursor: true,
         centeredSlides: true,
         slidesPerView: "auto",
-        autoplay: {
+        /*autoplay: {
             delay: 2500,
             disableOnInteraction: false,
-        },
+        },*/
         coverflowEffect: {
             rotate: 50,
             stretch: 0,
@@ -250,8 +264,6 @@
         let category = $('#category').val();
         let subcategory = $('#subcategory').val();
         let codeorname = $('#codeorname').val();
-        let database = $('#database').val();
-        let priceList = $('#priceList').val();
 
         let warehouses = warehouse.toString();
         if (codeorname === "") {
@@ -262,13 +274,12 @@
             url: '@Url.Action("GetInventory", "Inventory")',
             type: 'GET',
             dataType: 'JSON',
-            data: { whsCode: warehouses, itmsGrpCod: brand, itemName: codeorname, categoryCode: category, subCategoryCode: subcategory, stockVal: stock_value, database: database, priceList: priceList },
+            data: { whsCode: warehouses, itmsGrpCod: brand, itemName: codeorname, categoryCode: category, subCategoryCode: subcategory, stockVal: stock_value },
             beforeSend: function () {
                 setTimer();
             },
             success: function (data) {
-                            //console.log(data);
-                            
+                // check whether data have or not
                 if (data == "") {
                     if ($.fn.DataTable.isDataTable("#tblInventory")) {
                         $('#tblInventory').DataTable().clear().destroy();
@@ -288,11 +299,49 @@
 
                     cols = [];
                     keys.forEach(function (k) {
-                        cols.push({
-                            title: k,
-                            data: k
-                        });
-
+                         if (k == "Item Name") {
+                             cols.push({
+                                 title: k,
+                                 data: k,
+                                 'render': function (data, type, row) {
+                                     console.log(row.ImageUrl)
+                                     return (`
+                                        <img id="btnViewPhoto" class="img-circle user-image" data-id="${row.ImageUrl}" src="/noimage.png" width="30" data-toggle="modal" data-target="#viewPhotoModal" alt="" style="cursor: pointer">
+                                        <span>${data}</span>
+                                    `);
+                                }
+                            });
+                         }
+                         else if (k == "Item Code") {
+                              cols.push({
+                                   title: k,
+                                   data: k,
+                                   'render': function (data) {
+                                      return (`
+                                          <span class="text-bold">${data}</span>
+                                      `);
+                                  }
+                              });
+                          }
+                         else if(k != "ImageUrl") {
+                            cols.push({
+                                title: k,
+                                data: k
+                            });
+                         }
+                         /*else if(k == "ImageUrl"){
+                             cols.push({
+                                title: k,
+                                data: k,
+                                'render': function (data, type, row) {
+                                    return (`
+                                        <a href="#">
+                                           <button class="btn btn-primary btn-flat" onclick="" style="width:100%"><small class="fa fa-search"></small></button>
+                                        </a>
+                                    `);
+                                }
+                            });      
+                         } */                    
                     });
                     
                     if ($.fn.DataTable.isDataTable("#tblInventory")) {
@@ -313,20 +362,25 @@
                                 "autoWidth": true,
                                 "searching": false,
                                 "paging": false,
-                                "scrollY": '50vh',
+                                "scrollY": '60vh',
                                 "scrollX": false,
                                 "scrollCollapse": true,
                                 "columnDefs": [
                                     { visible: false, targets: 1 },
-                                    //{targets:["ItemName"], class:"wrapok"}
                                 ],
+                                "fixedColumns": {
+                                    left: 3
+                                },
                                 buttons: [
-                                    { extend: 'excel', className: 'btn bg-olive btn-flat' },
+                                    { extend: 'excel', 
+                                      className: 'btn bg-olive btn-flat'
+                                    },
                                 ],
                                 dom:
                                     "<'row'<'col-md-0'l><'col-md-6'B><'col-md-6'f>>" +
                                     "<'row'<'col-md-12'tr>>" +
                                     "<'row'<'col-md-5'i><'col-md-7'p>>",
+                                
                             });
 
                             table.rows.add(listInventory).draw();
@@ -345,18 +399,23 @@
                             let table = $('#tblInventory').DataTable({
                                 "columns": cols,
                                 "responsive": false,
-                                "lengthChange": false,
+                                "lengthChange": true,
                                 "autoWidth": true,
                                 "searching": true,
                                 "paging": false,
-                                "scrollY": '50vh',
+                                "scrollY": '60vh',
                                 "scrollX": true,
                                 "scrollCollapse": true,
                                 "columnDefs": [
                                     { visible: false, targets: 1 }
                                 ],
+                                "fixedColumns": {
+                                    left: 3
+                                },
                                 buttons: [
-                                    { extend: 'excel', className: 'btn bg-olive btn-flat' },
+                                    { extend: 'excel', 
+                                      className: 'btn bg-olive btn-flat'
+                                    },
                                 ],
                                 dom:
                                     "<'row'<'col-md-0'l><'col-md-6'B><'col-md-6'f>>" +
@@ -389,10 +448,40 @@
         });
     }
 
+    // View photo by ski
+    $(document).on("click", '#btnViewPhoto', function() {
+        let sku = $(this).data('id');
+        let listViewPhotoData = $("#listViewPhotoData");
+        $.ajax({
+            url: '/Inventory/GetPhotoBySKU/',
+            type: 'get',
+            dataType: 'json',
+            data: {sku: sku},
+            success: function(data) {
+                listViewPhotoData.empty();
+                if (data.status === true) {
+                    data.images.forEach(item => {
+                        listViewPhotoData.append(`
+                            <div class="swiper-slide"><img src="${item}" alt=""/></div>
+                        `);
+                    });
+                } else {
+                    listViewPhotoData.append(`
+                        <div class="col-md-12">
+                            <h5 class="text-center">No photo is available.</h5>
+                        </div>
+                    `);
+                }
+            }
+        });
+    });
+
     $(document).on('dblclick', 'td', function() {
         var table = $(this).closest('table').DataTable();
-        var folderName = table.row($(this).closest('tr')).data()['ItemCode'];
+        // var folderName = table.row($(this).closest('tr')).data()['ItemCode'];
         var space = table.row($(this).closest('tr')).data()['SpaceOrType'];
+        // var copyItmName = table.row($(this).closest('tr')).data()['ItemName'];
+        // console.log(copyItmName)
         
         $('#modal-space').modal({
             backdrop: 'static',
@@ -408,29 +497,29 @@
             $('.space-msg').text('No space or type');
         }
         
-        $.ajax({
-            url: '@Url.Action("CallImage", "Inventory")',
-            type: 'GET',
-            dataType: 'JSON',
-            data: {folderName: folderName},
-            beforeSend: function() {
-                setTimer();
-            },
-            success: function(data) {
-                resetTimer();
-                for (let i = 0;i < data.length;i++) {
-                    $(`<div class="swiper-slide">
-                           <img src="${data[i].imageName}"/>
-                       </div>`).appendTo('.swiper-wrapper');
-                }
-           },
-           error: function(data){
-               resetTimer();
-               $(`<div class="swiper-slide">
-                  <h3>No image found!</h3>
-              </div>`).appendTo('.swiper-wrapper');
-           }
-        });
+        // $.ajax({
+        //     url: '@Url.Action("CallImage", "Inventory")',
+        //     type: 'GET',
+        //     dataType: 'JSON',
+        //     data: {folderName: folderName},
+        //     beforeSend: function() {
+        //         setTimer();
+        //     },
+        //     success: function(data) {
+        //         resetTimer();
+        //         for (let i = 0;i < data.length;i++) {
+        //             $(`<div class="swiper-slide">
+        //                    <img src="${data[i].imageName}"/>
+        //                </div>`).appendTo('.swiper-wrapper');
+        //         }
+        //    },
+        //    error: function(data){
+        //        resetTimer();
+        //        $(`<div class="swiper-slide">
+        //           <h3>No image found!</h3>
+        //       </div>`).appendTo('.swiper-wrapper');
+        //    }
+        // });
         
         $('.close-modal, .close').click(function() {
             $('.swiper-slide').remove();
@@ -440,7 +529,7 @@
     
     $(document).on('click', 'li', function() {
         var table = $(this).closest('table').DataTable();
-        var folderName = table.row($(this).closest('li')).data()['ItemCode'];
+        // var folderName = table.row($(this).closest('li')).data()['ItemCode'];
         var space = table.row($(this).closest('li')).data()['SpaceOrType'];
         
         $('#modal-space').modal({
@@ -457,35 +546,60 @@
             $('.space-msg').text('No space or type');
         }
         
-        $.ajax({
-            url: '@Url.Action("CallImage", "Inventory")',
-            type: 'GET',
-            dataType: 'JSON',
-            data: {folderName: folderName},
-            beforeSend: function() {
-                setTimer();
-            },
-            success: function(data) {
-                resetTimer();
-                for (let i = 0;i < data.length;i++) {
-                    $(`<div class="swiper-slide">
-                           <img src="${data[i].imageName}" alt="img-slide"/>
-                       </div>`).appendTo('.swiper-wrapper');
-                }
-           },
-           error: function(){
-               resetTimer();
-               $(`<div class="swiper-slide">
-                  <h3>No image found!</h3>
-              </div>`).appendTo('.swiper-wrapper');
-           }
-        });
+        // $.ajax({
+        //     url: '@Url.Action("CallImage", "Inventory")',
+        //     type: 'GET',
+        //     dataType: 'JSON',
+        //     data: {folderName: folderName},
+        //     beforeSend: function() {
+        //         setTimer();
+        //     },
+        //     success: function(data) {
+        //         resetTimer();
+        //         for (let i = 0;i < data.length;i++) {
+        //             $(`<div class="swiper-slide">
+        //                    <img src="${data[i].imageName}" alt="img-slide"/>
+        //                </div>`).appendTo('.swiper-wrapper');
+        //         }
+        //    },
+        //    error: function(){
+        //        resetTimer();
+        //        $(`<div class="swiper-slide">
+        //           <h3>No image found!</h3>
+        //       </div>`).appendTo('.swiper-wrapper');
+        //    }
+        // });
         
         $('.close-modal, .close').click(function() {
             $('.swiper-slide').remove();
         });
         
     });
+
+    function CopyText(itemName,imageurl) {
+
+        //var table = $(this).closest('table').DataTable();
+        //// var folderName = table.row($(this).closest('li')).data()['ItemCode'];
+        //var space = table.row($(this).closest('li')).data()['SpaceOrType'];
+        //// Get the text field
+        //var itemName = table.row($(this).closest('li')).data()['Item Name'];
+        //var sku = table.row($(this).closest('li')).data()['ItemCode'];
+        //var imageurl = table.row($(this).closest('li')).data()['SpaceOrType'];
+        //var price = table.row($(this).closest('li')).data()['SpaceOrType'];
+        //var spcecs = document.getElementById("myInput");
+
+        // Select the text field
+        //copyText.select();
+        //copyText.setSelectionRange(0, 99999); // For mobile devices
+
+        // Copy the text inside the text field
+        navigator.clipboard.writeText(
+            imageurl + itemName
+        );
+
+        // Alert the copied text
+        alert("Copied");
+    }
     
     function InvLog() {
         
@@ -494,27 +608,41 @@
             type: 'POST',
             dataType: 'JSON',
             data: {brand: $('#brand option:selected').text(), 
-                    category: $('#category option:selected').text(), 
-                    subCategory: $('#subcategory option:selected').text(),
-                    code: $('#codeorname').val(),
-                    usercode: $('#usercode').val(),
-                    username: $('#username').val(),
-                    ip: $('#ip').val(),
-                    cmpName: $('#cmpName').val(),
-            },
-            beforeSend: function() {
-                console.log("Loading...");
+                category: $('#category option:selected').text(), 
+                subCategory: $('#subcategory option:selected').text(),
+                code: $('#codeorname').val(),
+                usercode: $('#usercode').val(),
+                username: $('#username').val(),
+                ip: $('#ip').val(),
+                cmpName: $('#cmpName').val(),
             },
             success: function(data) {
-                console.log(data)
+                
             }
         });
     }
+    
+    // $(document).on("mouseover", "tr td",function() {
+    //     let value = $(this).text();
+    //    
+    //     $(".copy-item-name").removeClass("hide");
+    //    
+    //     console.log(value)
+    // });
+    //
+    // $(document).on("mouseleave", "tr td",function() {
+    //     let value = $(this).text();
+    //    
+    //     $(".copy-item-name").addClass("hide");
+    //    
+    //     console.log(value)
+    // });
 
     $(window).scroll(function() {
         let scrollTop = $(window).scrollTop();
         if(scrollTop > 50) {
-            $('.to-top').addClass('active');        } 
+            $('.to-top').addClass('active');
+        } 
         else {
             $('.to-top').removeClass('active');
         }
@@ -527,9 +655,9 @@
         $('.select2').select2();
 
         let codeOrName = $('input[type="text"]').val();
-
+        
         if (codeOrName === '') {
-            $(':input[type="submit"]').prop('disabled', true);
+            $('button[type="submit"]').prop('disabled', true);
         }
         
         $('#brand').change(function () {
@@ -573,8 +701,24 @@
             let value = $(this).val();
             let brand = $('#brand').val();
             let category = $('#category').val();
-            if (value.length >= 3 && value != '') {
+           
+            if (value.length >= 1 && value != '') {
                 $(':input[type="submit"]').prop('disabled', false);
+                 //AdvandSearch
+                $.ajax({
+                    url: '@Url.Action("ItemList", "Inventory")',
+                    type: 'GET',
+                    data:{Search:value},
+                    dataType: 'JSON',
+                    success: function (data) {
+                      $('#item').empty();
+                      for (let i = 0; i < data.length; i++) {
+                            //console.log(data[i].itmsGrpCod);
+                            $('#item').append(`<option value="${data[i].itemCode}"> ${data[i].itemName} </option>`);
+                        }
+                    }
+                });
+
             } else {
                 if (brand != '0' || category != '0') {
                     $(':input[type="submit"]').prop('disabled', false);
@@ -582,6 +726,7 @@
                     $(':input[type="submit"]').prop('disabled', true);
                 }
             }
+
 
         });
 
@@ -591,11 +736,13 @@
             type: 'GET',
             dataType: 'JSON',
             success: function (data) {
-                //console.log(data)
-                for (let i = 0; i < data.length; i++) {
-                    //console.log(data[i].whsCode);
-                    $('#whsCodes').append('<option value="' + data[i].whsCode + '" selected>' + data[i].whsName + '</option>');
-                }
+                 for (let i = 0; i < data.length; i++) {
+                     $('#whsCodes').append(`<option value="${data[i].whsCode}" selected>${data[i].whsName}</option>`);
+                 }
+                 // let values="01,02,03";
+                 // $.each(values.split(","), function(i,e){
+                 //     $("#whsCodes option[value='" + e + "']").prop("selected", true);
+                 // });
             }
         });
 
@@ -606,7 +753,6 @@
             dataType: 'JSON',
             success: function (data) {
                 for (let i = 0; i < data.length; i++) {
-                    //console.log(data[i].itmsGrpCod);
                     $('#brand').append('<option value="' + data[i].itmsGrpCod + '">' + data[i].itmsGrpNam + '</option>');
                 }
             }
@@ -618,9 +764,7 @@
             type: 'GET',
             dataType: 'JSON',
             success: function (data) {
-                //console.log(data);
                 for (let i = 0; i < data.length; i++) {
-                    //console.log(data[i].code);
                     $('#category').append('<option value="' + data[i].categoryCode + '">' + data[i].categoryName + '</option>');
                 }
             }

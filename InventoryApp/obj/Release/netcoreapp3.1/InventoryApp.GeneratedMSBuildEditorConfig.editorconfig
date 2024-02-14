@@ -1,3 +1,5 @@
 is_global = true
 build_property.RootNamespace = InventoryApp
-build_property.ProjectDir = D:\PTC-Computer\InventoryApp\InventoryApp\
+build_property.ProjectDir = D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 

@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace InventoryApp
 {
@@ -21,11 +19,13 @@ namespace InventoryApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSession();
             services.AddControllersWithViews();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddRouting(options => options.LowercaseUrls = true);
+            services.AddMvc();
+            services.AddSession();
+            
             services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddProgressiveWebApp();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,9 +64,14 @@ namespace InventoryApp
             Models.Classes.ConnectionString.Password = Configuration.GetSection("Password").Value.ToString();
 
             Models.Classes.ConnectionString.QueryDatabase = Configuration.GetSection("QueryDatabase").Value.ToString();
+            Models.Classes.ConnectionString.QueryBrand = Configuration.GetSection("QueryBrand").Value.ToString();
             Models.Classes.ConnectionString.QueryCategory = Configuration.GetSection("QueryCategory").Value.ToString();
             Models.Classes.ConnectionString.QuerySubCategory = Configuration.GetSection("QuerySubCategory").Value.ToString();
+            Models.Classes.ConnectionString.QueryItemList= Configuration.GetSection("QueryItemList").Value.ToString();
             Models.Classes.ConnectionString.ImageUrl = Configuration.GetSection("ImageUrl").Value.ToString();
+            
+            Models.Classes.ConnectionString.ApiUrl = Configuration.GetSection("ApiUrl").Value.ToString();
+            Models.Classes.ConnectionString.ApiAuth = Configuration.GetSection("ApiAuth").Value.ToString();
             
             Models.Classes.ConnectionString.AppName = Configuration.GetSection("AppName").Value.ToString();
             Models.Classes.ConnectionString.AppInfo = Configuration.GetSection("AppInfo").Value.ToString();

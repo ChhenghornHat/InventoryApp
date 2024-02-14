@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\PTC-Computer\\InventoryApp\\InventoryApp\\InventoryApp.csproj": {}
+    "D:\\Web Developments\\ASP.NET\\InventoryApp\\InventoryApp\\InventoryApp.csproj": {}
   },
   "projects": {
-    "D:\\PTC-Computer\\InventoryApp\\InventoryApp\\InventoryApp.csproj": {
+    "D:\\Web Developments\\ASP.NET\\InventoryApp\\InventoryApp\\InventoryApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\PTC-Computer\\InventoryApp\\InventoryApp\\InventoryApp.csproj",
+        "projectUniqueName": "D:\\Web Developments\\ASP.NET\\InventoryApp\\InventoryApp\\InventoryApp.csproj",
         "projectName": "InventoryApp",
-        "projectPath": "D:\\PTC-Computer\\InventoryApp\\InventoryApp\\InventoryApp.csproj",
+        "projectPath": "D:\\Web Developments\\ASP.NET\\InventoryApp\\InventoryApp\\InventoryApp.csproj",
         "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "D:\\PTC-Computer\\InventoryApp\\InventoryApp\\obj\\",
+        "outputPath": "D:\\Web Developments\\ASP.NET\\InventoryApp\\InventoryApp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -44,9 +44,17 @@
               "target": "Package",
               "version": "[3.1.31, )"
             },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
             "System.Data.SqlClient": {
               "target": "Package",
               "version": "[4.8.5, )"
+            },
+            "WebEssentials.AspNetCore.PWA": {
+              "target": "Package",
+              "version": "[1.0.65, )"
             }
           },
           "imports": [
@@ -68,7 +76,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101\\RuntimeIdentifierGraph.json"
         }
       }
     }

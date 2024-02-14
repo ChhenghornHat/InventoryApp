@@ -4,7 +4,6 @@ using InventoryApp.Models.Classes;
 using InventoryApp.Models.Brand;
 using InventoryApp.Models.SubCategory;
 using InventoryApp.Models.WareHouse;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,13 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using InventoryApp.Models.Image;
 using InventoryApp.Models.StoreImage;
+using InventoryApp.Models.ItemList;
+using Newtonsoft.Json;
 
 namespace InventoryApp.Controllers
 {
@@ -20,35 +25,40 @@ namespace InventoryApp.Controllers
     {
         public IActionResult Index()
         {
-            var role = HttpContext.Session.GetInt32("Role");
-            if (role == 1)
+            var strRole = Request.Cookies["Role"];
+            int role;
+            if (strRole == null)
             {
-                return RedirectToAction("InvLog", "Admin");
-            }
-            else if (role == 0)
-            {
-                return View();
+                role = -1;
             }
             else
             {
-                return RedirectToAction("Index", "Login");
+                role = Convert.ToInt32(strRole);
             }
+
+            return role switch
+            {
+                1 => RedirectToAction("InvLog", "Admin"),
+                0 => View(),
+                _ => RedirectToAction("Index", "Login")
+            };
         }
         
         [HttpGet]
-        public IActionResult GetInventory(string whsCode, string itmsGrpCod, string itemName, string categoryCode, string subCategoryCode, string stockVal, string database, string priceList)
+        public IActionResult GetInventory(string whsCode, string itmsGrpCod, string itemName, string categoryCode, string subCategoryCode, string stockVal)
         {
-            DataTable dt = new DataTable();
-            ReturnError lsErr = new ReturnError();
+            var dt = new DataTable();
+            var lsErr = new ReturnError();
             try
             {
-                //var priceList = HttpContext.Session.GetString("U_Price");
-                //var database = HttpContext.Session.GetString("Database");
-                LoginDb1 login = new LoginDb1(database);
+                var database = Request.Cookies["Database"];
+                var priceList = Request.Cookies["U_Price"];
+                var login = new LoginDb1(database);
 
                 if (login._errCode == 0)
                 {
                     login._Cmd = new SqlCommand("EXEC _USP_Inventory_Search '"+whsCode+"','"+priceList+"','"+itmsGrpCod+"','"+itemName+"','"+categoryCode+"','"+subCategoryCode+"','"+stockVal+"'", login._Con);
+                    login._Cmd.CommandTimeout = 60;
                     login._Ad = new SqlDataAdapter(login._Cmd);
                     login._Ad.Fill(dt);
                     login._Con.Close();
@@ -64,10 +74,11 @@ namespace InventoryApp.Controllers
                 lsErr.errCode = ex.HResult;
                 lsErr.errMsg = ex.Message;
             }
-            string str = DataTableSystemTextJson(dt);
+            var str = DataTableSystemTextJson(dt);
             return Ok(str);
         }
-        public static string DataTableSystemTextJson(DataTable dataTable)
+
+        private static string DataTableSystemTextJson(DataTable dataTable)
         {
             if (dataTable == null)
             {
@@ -81,19 +92,36 @@ namespace InventoryApp.Controllers
             return System.Text.Json.JsonSerializer.Serialize(data);
         }
 
-        [HttpPost]
-        public IActionResult IvnLog(string brand, string category, string subCategory, string code, string userCode, string userName, string cmpName, string ip)
+        [HttpGet]
+        public async Task<IActionResult> GetPhotoBySKU(string sku)
         {
-            int result = 1;
-            LoginDb2 loginDb2 = new LoginDb2();
+            var accessToken = ConnectionString.ApiAuth;
 
-            //var userCode = HttpContext.Session.GetString("UserCode");
-            // var userName = HttpContext.Session.GetString("Username");
-            // var cmpName = HttpContext.Session.GetString("CompanyName");
-            //var ip = HttpContext.Session.GetString("Ip");
+            var client = new HttpClient();
+
+            var authHeader = new AuthenticationHeaderValue("Basic", accessToken);
+            client.DefaultRequestHeaders.Authorization = authHeader;
+
+            var content = await client.GetStringAsync($"{ConnectionString.ApiUrl}api/v2/products/images/{sku}");
+
+            var result = JsonConvert.DeserializeObject<ClsImage>(content);
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        public IActionResult IvnLog(string brand, string category, string subCategory, string code)
+        {
+            var result = 1;
+            var loginDb2 = new LoginDb2();
+
+            var userCode = Request.Cookies["UserCode"];
+            var userName = Request.Cookies["Username"];
+            var cmpName = Request.Cookies["CompanyName"];
+            var ip = Request.Cookies["Ip"];
             if (loginDb2._errCode == 0)
             {
-                string query = "Search";
+                const string query = "Search";
                 loginDb2._Cmd = new SqlCommand(query, loginDb2._Con);
                 loginDb2._Cmd.CommandType = CommandType.StoredProcedure;
                 loginDb2._Cmd.Parameters.AddWithValue("@UserCode", userCode);
@@ -117,18 +145,18 @@ namespace InventoryApp.Controllers
 
         public IActionResult GetWareHouse()
         {
-            List<ClsWareHouse> lstWareHouses = new List<ClsWareHouse>();
+            var lstWareHouses = new List<ClsWareHouse>();
             ClsWareHouse warehouse;
 
-            ReturnError lsErr = new ReturnError();
+            var lsErr = new ReturnError();
             try
             {
-                DataTable dt = new DataTable();
-                var database = HttpContext.Session.GetString("Database");
-                LoginDb1 login = new LoginDb1(database);
+                var dt = new DataTable();
+                var database = Request.Cookies["Database"];
+                var login = new LoginDb1(database);
                 if (login._errCode == 0)
                 {
-                    string query = "EXEC _USP_Warehouse";
+                    const string query = "EXEC _USP_Warehouse";
                     login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
                     login._Con.Close();
@@ -158,28 +186,30 @@ namespace InventoryApp.Controllers
         [HttpGet]
         public IActionResult GetBrand()
         {
-            List<ClsBrand> lsBrands = new List<ClsBrand>();
+            var lsBrands = new List<ClsBrand>();
             ClsBrand brand;
 
-            ReturnError lsErr = new ReturnError();
+            var lsErr = new ReturnError();
             try
             {
-                DataTable dt = new DataTable();
-                var database = HttpContext.Session.GetString("Database");
-                LoginDb1 login = new LoginDb1(database);
+                var dt = new DataTable();
+                var database = Request.Cookies["Database"];
+                var login = new LoginDb1(database);
 
                 if (login._errCode == 0)
                 {
-                    string query = "SELECT ItmsGrpCod, ItmsGrpNam FROM OITB";
+                    var query = ConnectionString.QueryBrand;
                     login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
                     login._Con.Close();
 
                     foreach (DataRow row in dt.Rows)
                     {
-                        brand = new ClsBrand();
-                        brand.ItmsGrpCod = row[0].ToString();
-                        brand.ItmsGrpNam = row[1].ToString();
+                        brand = new ClsBrand
+                        {
+                            ItmsGrpCod = row[0].ToString(),
+                            ItmsGrpNam = row[1].ToString()
+                        };
 
                         lsBrands.Add(brand);
                     }
@@ -200,19 +230,19 @@ namespace InventoryApp.Controllers
         [HttpGet]
         public IActionResult GetCategory()
         {
-            List<ClsCategory> lsCategory = new List<ClsCategory>();
+            var lsCategory = new List<ClsCategory>();
             ClsCategory category;
 
-            ReturnError lsErr = new ReturnError();
+            var lsErr = new ReturnError();
             try
             {
-                DataTable dt = new DataTable();
-                var database = HttpContext.Session.GetString("Database");
-                LoginDb1 login = new LoginDb1(database);
+                var dt = new DataTable();
+                var database = Request.Cookies["Database"];
+                var login = new LoginDb1(database);
 
                 if (login._errCode == 0)
                 {
-                    string query = ConnectionString.QueryCategory;
+                    var query = ConnectionString.QueryCategory;
                     login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
                     login._Con.Close();
@@ -240,21 +270,21 @@ namespace InventoryApp.Controllers
             return Ok(lsCategory);
         }
         [HttpGet]
-        public IActionResult GetCategoryFilter(string code, string database)
+        public IActionResult GetCategoryFilter(string code)
         {
-            List<ClsSubCategory> lsSubCategory = new List<ClsSubCategory>();
+            var lsSubCategory = new List<ClsSubCategory>();
             ClsSubCategory subcategory;
 
-            ReturnError lsErr = new ReturnError();
+            var lsErr = new ReturnError();
             try
             {
-                DataTable dt = new DataTable();
-                //var database = HttpContext.Session.GetString("Database");
-                LoginDb1 login = new LoginDb1(database);
+                var dt = new DataTable();
+                var database = Request.Cookies["Database"];
+                var login = new LoginDb1(database);
 
                 if (login._errCode == 0)
                 {
-                    string query = ""+ConnectionString.QuerySubCategory+" IN('"+code+"')";
+                    var query = ""+ConnectionString.QuerySubCategory+" IN('"+code+"')";
                     login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
                     login._Con.Close();
@@ -285,26 +315,67 @@ namespace InventoryApp.Controllers
         [HttpGet]
         public IActionResult CallImage(string folderName)
         {
-            List<StoreImage> storeImages = new List<StoreImage>();
-            var Path = ConnectionString.ImageUrl + folderName +"\\";
+            var storeImages = new List<StoreImage>();
+            var path = ConnectionString.ImageUrl + folderName +"\\";
             //var Path = ConnectionString.ImageUrl;
             
-            DirectoryInfo place = new DirectoryInfo(Path);
-            FileInfo[] Files = place.GetFiles();
+            var place = new DirectoryInfo(path);
+            var files = place.GetFiles();
 
-            foreach(FileInfo i in Files)
+            foreach(var i in files)
             {
-                StoreImage image = new StoreImage();
-                byte[] bytes = System.IO.File.ReadAllBytes(Path + i.Name);
-                image.ImageUrl = Path + i.Name;
+                var image = new StoreImage();
+                var bytes = System.IO.File.ReadAllBytes(path + i.Name);
+                image.ImageUrl = path + i.Name;
 
-                string base64String = Convert.ToBase64String(bytes, 0, bytes.Length);
+                var base64String = Convert.ToBase64String(bytes, 0, bytes.Length);
                 image.ImageName = "data:image/png;base64," + base64String;
                 
                 storeImages.Add(image);
             }
 
             return Ok(storeImages);
+        }
+        [HttpGet]
+        public IActionResult ItemList(string Search)
+        {
+            var database = Request.Cookies["Database"];
+            var date = DateTime.Now.Year+DateTime.Now.Month.ToString()+DateTime.Now.Day;
+            var count = ClsItemList.itemLists.Where(row => row.Date == date && row.Database==database).ToList();
+            if (count.Count == 0)
+            {
+                ClsItemList.itemLists.DefaultIfEmpty();
+                var dt = new DataTable();
+                var lsErr = new ReturnError();
+                try
+                {
+                    var login = new LoginDb1(database);
+
+                    if (login._errCode == 0)
+                    {
+                        login._Cmd = new SqlCommand(ConnectionString.QueryItemList+" '"+ database+"'", login._Con);
+                        login._Ad = new SqlDataAdapter(login._Cmd);
+                        login._Ad.Fill(dt);
+                        login._Con.Close();
+                    }
+                    else
+                    {
+                        lsErr.errCode = login._errCode;
+                        lsErr.errMsg = login._errMsg;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    lsErr.errCode = ex.HResult;
+                    lsErr.errMsg = ex.Message;
+                }
+                var str = DataTableSystemTextJson(dt);
+                ClsItemList.itemLists = JsonConvert.DeserializeObject<List<ItemList>>(str, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            }
+
+            var search=ClsItemList.itemLists.Where(row=>row.ItemCode.Contains(Search.ToUpper()) && row.Database == database).ToList();
+            return Ok(search);
+
         }
     }
 }

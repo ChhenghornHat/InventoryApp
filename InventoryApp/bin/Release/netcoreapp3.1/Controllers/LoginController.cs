@@ -12,53 +12,68 @@ namespace InventoryApp.Controllers
 {
     public class LoginController : Controller
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public LoginController(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
         public IActionResult Index()
         {
-            var role = HttpContext.Session.GetInt32("Role");
-            if (role == 1)
+            var strRole = Request.Cookies["Role"];
+            int role;
+            if (strRole == null)
             {
-                return RedirectToAction("InvLog", "Admin");
-            }
-            else if (role == 0)
-            {
-                return RedirectToAction("Index", "Inventory");
+                role = -1;
             }
             else
             {
-                return View();
+                role = Convert.ToInt32(strRole);
             }
+
+            return role switch
+            {
+                1 => RedirectToAction("InvLog", "Admin"),
+                0 => RedirectToAction("Index", "Inventory"),
+                _ => View()
+            };
         }
         
         [HttpGet]
         public IActionResult PostLogin(string usercode, string password, string database, string ip, string cmpName)
         {
-            int result = 1;
+            var result = 1;
             
             //ConnectionString.Database = database;
-            DataTable dt = new DataTable();
-            LoginDb1 login = new LoginDb1(database);
-            HttpContext.Session.SetString("Database",database);
+            var dt = new DataTable();
+            var login = new LoginDb1(database);
+            
             if (login._errCode == 0)
             {
                 try
                 {
-                    string query = "EXEC _USP_User_Inventory '" + usercode + "'," + password + "";
+                    var query = "EXEC _USP_User_Inventory '" + usercode + "'," + password + "";
                     login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
                     login._Con.Close();
+                    var options = new CookieOptions
+                    {
+                        Expires = DateTime.Now.AddDays(1),
+                    };
+                    _httpContextAccessor.HttpContext.Response.Cookies.Append("Database",database, options);
 
-                    
                     foreach (DataRow row in dt.Rows)
                     {
-                        HttpContext.Session.SetString("U_Price", row["U_Price"].ToString());
-                        HttpContext.Session.SetString("UserCode", usercode);
-                        HttpContext.Session.SetString("Username", row["UserName"].ToString());
-                        HttpContext.Session.SetString("CompanyName", cmpName);
-                        HttpContext.Session.SetString("Ip", ip);
-                        HttpContext.Session.SetInt32("Role", Convert.ToInt32(row["Role"].ToString()));
-
+                        _httpContextAccessor.HttpContext.Response.Cookies.Append("U_Price", row["U_Price"].ToString(), options);
+                        _httpContextAccessor.HttpContext.Response.Cookies.Append("UserCode", usercode, options);
+                        _httpContextAccessor.HttpContext.Response.Cookies.Append("Username", row["UserName"].ToString(), options);
+                        _httpContextAccessor.HttpContext.Response.Cookies.Append("CompanyName", cmpName, options);
+                        _httpContextAccessor.HttpContext.Response.Cookies.Append("Ip", ip, options);
+                        _httpContextAccessor.HttpContext.Response.Cookies.Append("Role", row["Role"].ToString(), options);
+                        
                         result = 0;
                     }
+                    
                 }
                 catch (Exception)
                 {
@@ -66,8 +81,8 @@ namespace InventoryApp.Controllers
                 }
                 finally
                 {
-                    LoginDb2 loginDb2 = new LoginDb2();
-                    var username = HttpContext.Session.GetString("Username");
+                    var loginDb2 = new LoginDb2();
+                    var username = Request.Cookies["Username"];
                     try
                     {
                         string query = "login";
@@ -98,27 +113,28 @@ namespace InventoryApp.Controllers
         
         public IActionResult GetCompanyName()
         {
-            List<ClsCompanyName> lstCompanyName = new List<ClsCompanyName>();
+            var lstCompanyName = new List<ClsCompanyName>();
             ClsCompanyName companyName;
 
-            ReturnError lstErr = new ReturnError();
+            var lstErr = new ReturnError();
             try
             {
-                DataTable dt = new DataTable();
-                Login login = new Login();
+                var dt = new DataTable();
+                var login = new Login();
 
                 if (login._errCode == 0)
                 {
-                    string query = ConnectionString.QueryDatabase;
+                    var query = ConnectionString.QueryDatabase;
                     login._Ad = new SqlDataAdapter(query, login._Con);
                     login._Ad.Fill(dt);
 
                     foreach(DataRow row in dt.Rows)
                     {
-                        companyName = new ClsCompanyName();
-
-                        companyName.dbName = row[0].ToString();
-                        companyName.cmpName = row[1].ToString();
+                        companyName = new ClsCompanyName
+                        {
+                            dbName = row[0].ToString(),
+                            cmpName = row[1].ToString()
+                        };
 
                         lstCompanyName.Add(companyName);
                     }
@@ -139,7 +155,11 @@ namespace InventoryApp.Controllers
 
         public IActionResult Logout()
         {
-            HttpContext.Session.Remove("Role");
+            // Response.Cookies.Delete();
+            foreach (var cookie in Request.Cookies.Keys)
+            {
+                Response.Cookies.Delete(cookie);
+            }
             return RedirectToAction("Index", "Login");
         }
     }

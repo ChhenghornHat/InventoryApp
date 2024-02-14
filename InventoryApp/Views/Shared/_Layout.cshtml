@@ -6,7 +6,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - InventoryApp</title>
-    <link rel="icon" href="~/assets/dist/img/logo/ptc-computer-logo.png" type="image/svg"/>
+    <link rel="icon" href="~/assets/dist/img/logo/ptc-computer-logo.jpg" type="image/jpg"/>
 
     <!-- Bootstrap 3.3.7 -->
     <link rel="stylesheet" href="~/assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
@@ -52,7 +52,7 @@
             <div class="container-fluid">
                 <div class="navbar-header">
                     @* <a href="#" class="navbar-brand"><b>Inventory</b> App</a> *@
-                    <a href="#" class="navbar-brand"><b>@HttpContextAccessor.HttpContext.Session.GetString("CompanyName")</b> (@HttpContextAccessor.HttpContext.Session.GetString("Username"))</a>
+                        <a href="#" class="navbar-brand"><b>@HttpContextAccessor.HttpContext.Request.Cookies["Username"]</b></a>
                     <button type="button" class="navbar-toggle collapsed">
                         <a asp-action="Logout" asp-controller="Login" style="color: white;">Logout <i class="fa fa-sign-out"></i></a>
                     </button>

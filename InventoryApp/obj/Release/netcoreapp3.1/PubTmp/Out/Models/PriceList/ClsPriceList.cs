@@ -1,7 +1,7 @@
 ﻿namespace InventoryApp.Models.PriceList
 {
-    public static class ClsPriceList
+    public class ClsPriceList
     {
-        public static string PriceList { get; set; }
+        public string PriceList { get; set; }
     }
 }
