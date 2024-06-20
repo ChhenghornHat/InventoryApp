@@ -14818,3 +14818,4 @@ D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\obj\Debug\netcoreapp3.1\In
 D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\obj\Debug\netcoreapp3.1\InventoryApp.dll
 D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\obj\Debug\netcoreapp3.1\InventoryApp.pdb
 D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\obj\Debug\netcoreapp3.1\InventoryApp.genruntimeconfig.cache
+D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\bin\Debug\netcoreapp3.1\appsettings_production.json

@@ -1465,6 +1465,7 @@ D:\Web Developments\Publish\PTC Inventory App\Inventory App Version\wwwroot\noim
 D:\Web Developments\Publish\PTC Inventory App\Inventory App Version\wwwroot\PTC-Logo-512x512.png
 D:\Web Developments\Publish\PTC Inventory App\Inventory App Version\appsettings.Development.json
 D:\Web Developments\Publish\PTC Inventory App\Inventory App Version\appsettings.json
+D:\Web Developments\Publish\PTC Inventory App\Inventory App Version\appsettings_production.json
 D:\Web Developments\Publish\PTC Inventory App\Inventory App Version\refs\Microsoft.AspNetCore.Antiforgery.dll
 D:\Web Developments\Publish\PTC Inventory App\Inventory App Version\refs\Microsoft.AspNetCore.Authentication.Abstractions.dll
 D:\Web Developments\Publish\PTC Inventory App\Inventory App Version\refs\Microsoft.AspNetCore.Authentication.Cookies.dll

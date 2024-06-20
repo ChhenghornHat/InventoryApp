@@ -76,6 +76,9 @@ namespace InventoryApp
             Models.Classes.ConnectionString.AppName = Configuration.GetSection("AppName").Value.ToString();
             Models.Classes.ConnectionString.AppInfo = Configuration.GetSection("AppInfo").Value.ToString();
             Models.Classes.ConnectionString.AppVersion = Configuration.GetSection("AppVersion").Value.ToString();
+            
+            Models.Classes.ConnectionString.ChatId = Configuration.GetSection("ChatId").Value.ToString();
+            Models.Classes.ConnectionString.Token = Configuration.GetSection("Token").Value.ToString();
         }
     }
 }

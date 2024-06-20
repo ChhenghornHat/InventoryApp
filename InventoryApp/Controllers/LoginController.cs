@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace InventoryApp.Controllers
 {
@@ -43,6 +45,7 @@ namespace InventoryApp.Controllers
         public IActionResult PostLogin(string usercode, string password, string database, string ip, string cmpName)
         {
             var result = 1;
+            var username = "";
             
             //ConnectionString.Database = database;
             var dt = new DataTable();
@@ -64,9 +67,11 @@ namespace InventoryApp.Controllers
 
                     foreach (DataRow row in dt.Rows)
                     {
+                        username = row["UserName"].ToString();
+                        
                         _httpContextAccessor.HttpContext.Response.Cookies.Append("U_Price", row["U_Price"].ToString(), options);
                         _httpContextAccessor.HttpContext.Response.Cookies.Append("UserCode", usercode, options);
-                        _httpContextAccessor.HttpContext.Response.Cookies.Append("Username", row["UserName"].ToString(), options);
+                        _httpContextAccessor.HttpContext.Response.Cookies.Append("Username", username, options);
                         _httpContextAccessor.HttpContext.Response.Cookies.Append("CompanyName", cmpName, options);
                         _httpContextAccessor.HttpContext.Response.Cookies.Append("Ip", ip, options);
                         _httpContextAccessor.HttpContext.Response.Cookies.Append("Role", row["Role"].ToString(), options);
@@ -82,7 +87,7 @@ namespace InventoryApp.Controllers
                 finally
                 {
                     var loginDb2 = new LoginDb2();
-                    var username = Request.Cookies["Username"];
+                    
                     try
                     {
                         string query = "login";
@@ -94,6 +99,14 @@ namespace InventoryApp.Controllers
                         loginDb2._Cmd.Parameters.AddWithValue("@Company", cmpName);
 
                         loginDb2._Cmd.ExecuteNonQuery();
+                        
+                        var message = $"Company Name: <b>{cmpName}</b>\nUserCode: <b>{usercode}</b>\nUsername: <b>{username}</b>\nIP Address: <b>{ip}</b>\nLogged in Date: <b>{DateTime.Now}</b>";
+
+                        var url = $"https://api.telegram.org/bot{ConnectionString.Token}/sendMessage?chat_id={ConnectionString.ChatId}&parse_mode=html&text={message}";
+
+                        using var webClient = new WebClient();
+                        webClient.DownloadString(url);
+                        
                         loginDb2._Con.Close();
                     }
                     catch (Exception e)

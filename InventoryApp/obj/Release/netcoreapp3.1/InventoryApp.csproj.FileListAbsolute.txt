@@ -12921,3 +12921,4 @@ D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\obj\Release\netcoreapp3.1\
 D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\obj\Release\netcoreapp3.1\InventoryApp.dll
 D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\obj\Release\netcoreapp3.1\InventoryApp.pdb
 D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\obj\Release\netcoreapp3.1\InventoryApp.genruntimeconfig.cache
+D:\Web Developments\ASP.NET\InventoryApp\InventoryApp\bin\Release\netcoreapp3.1\appsettings_production.json

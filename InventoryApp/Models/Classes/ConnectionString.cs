@@ -21,5 +21,8 @@
         public static string QueryItemList { get; set; }
         public static string ApiUrl { get; set; }
         public static string ApiAuth { get; set; }
+        
+        public static string ChatId { get; set; }
+        public static string Token { get; set; }
     }
 }
